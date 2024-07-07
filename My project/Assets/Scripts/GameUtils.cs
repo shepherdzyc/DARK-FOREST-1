@@ -73,7 +73,6 @@ public class GameUtils
             {
                 randomPos[i][0] = newPosX;
                 randomPos[i][1] = newPosY;
-                Debug.Log("New position of randomPos[" + i + "] is: " + randomPos[i][0] + ", " + randomPos[i][1]);
                 break;
             }
         }

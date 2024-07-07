@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -63,10 +62,9 @@ public class RollController : MonoBehaviour
                 if (blockTransform != null && !alreadyChosen && Vector2.Distance(worldPos, blockTransform.position) <= 40)
                 {
                     GameUtils.updatePos(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col, x, y);
+                    moveBlockBg(false, selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
                     selectedObject.GetComponent<RollController>().row = x;
                     selectedObject.GetComponent<RollController>().col = y;
-                    moveBlockBg(false, selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
-                    moveBlockBg(true, x, y);
                     return blockTransform.position;
                 }
             }
@@ -88,6 +86,7 @@ public class RollController : MonoBehaviour
         }
     }
 
+    //移动时更新背景颜色
     public void moveBlockBg(bool isRed, int row, int col)
     {
         if (selectedObject.GetComponent<RollController>().type == GameUtils.rollType.rowType)

@@ -28,6 +28,7 @@ public class GameMainView : MonoBehaviour
 
     void Update()
     {
+        setBlockBg(true);
     }
 
     //回合开始时创建三个骰子
@@ -57,7 +58,6 @@ public class GameMainView : MonoBehaviour
                 newRoll.transform.position = blockTransform.position;
             }
         }
-        setBlockBg(true);
     }
 
     //回合开始时随机创建敌人
@@ -77,6 +77,10 @@ public class GameMainView : MonoBehaviour
 
     public void setBlockBg(bool isRed)
     {
+        if (createdRollArr.Length == 0)
+        {
+            return;
+        }
         for (int i = 0; i < createdRollArr.Length; i++)
         {
             GameUtils.rollType type = createdRollArr[i].GetComponent<RollController>().type;
