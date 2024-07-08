@@ -62,9 +62,17 @@ public class RollController : MonoBehaviour
                 if (blockTransform != null && !alreadyChosen && Vector2.Distance(worldPos, blockTransform.position) <= 40)
                 {
                     GameUtils.updatePos(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col, x, y);
-                    moveBlockBg(false, selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
+                    moveBlockFalse(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
                     selectedObject.GetComponent<RollController>().row = x;
                     selectedObject.GetComponent<RollController>().col = y;
+                    for (int i = 0; i < GameUtils.blockNumArr.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < GameUtils.blockNumArr.GetLength(1); j++)
+                        {
+                            GameUtils.blockNumArr[i, j] = 0;
+                        }
+                    }
+                    chessBoard.GetComponent<GameMainView>().setBlockNum();
                     return blockTransform.position;
                 }
             }
@@ -86,8 +94,8 @@ public class RollController : MonoBehaviour
         }
     }
 
-    //移动时更新背景颜色
-    public void moveBlockBg(bool isRed, int row, int col)
+    //移动时更新背景颜色和数字为不可见
+    public void moveBlockFalse(int row, int col)
     {
         if (selectedObject.GetComponent<RollController>().type == GameUtils.rollType.rowType)
         {
@@ -95,7 +103,8 @@ public class RollController : MonoBehaviour
             {
                 string blockName = "block_" + j.ToString() + col.ToString();
                 Transform blockTransform = chessBoard.transform.Find(blockName);
-                blockTransform.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform.GetChild(0).gameObject.SetActive(false);
+                blockTransform.GetChild(1).gameObject.SetActive(false);
             }
         }
         else if (selectedObject.GetComponent<RollController>().type == GameUtils.rollType.colType)
@@ -104,32 +113,38 @@ public class RollController : MonoBehaviour
             {
                 string blockName = "block_" + row.ToString() + j.ToString();
                 Transform blockTransform = chessBoard.transform.Find(blockName);
-                blockTransform.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform.GetChild(0).gameObject.SetActive(false);
+                blockTransform.GetChild(1).gameObject.SetActive(false);
             }
         }
         else
         {
             Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
-            blockTransform.GetChild(0).gameObject.SetActive(isRed);
+            blockTransform.GetChild(0).gameObject.SetActive(false);
+            blockTransform.GetChild(1).gameObject.SetActive(false);
             if (row - 1 >= 0)
             {
                 Transform blockTransform1 = chessBoard.transform.Find("block_" + (row - 1).ToString() + col.ToString());
-                blockTransform1.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform1.GetChild(0).gameObject.SetActive(false);
+                blockTransform1.GetChild(1).gameObject.SetActive(false);
             }
             if (row + 1 <= 5)
             {
                 Transform blockTransform2 = chessBoard.transform.Find("block_" + (row + 1).ToString() + col.ToString());
-                blockTransform2.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform2.GetChild(0).gameObject.SetActive(false);
+                blockTransform2.GetChild(1).gameObject.SetActive(false);
             }
             if (col - 1 >= 0)
             {
                 Transform blockTransform3 = chessBoard.transform.Find("block_" + row.ToString() + (col - 1).ToString());
-                blockTransform3.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform3.GetChild(0).gameObject.SetActive(false);
+                blockTransform3.GetChild(1).gameObject.SetActive(false);
             }
             if (col + 1 <= 4)
             {
                 Transform blockTransform4 = chessBoard.transform.Find("block_" + row.ToString() + (col + 1).ToString());
-                blockTransform4.GetChild(0).gameObject.SetActive(isRed);
+                blockTransform4.GetChild(0).gameObject.SetActive(false);
+                blockTransform4.GetChild(1).gameObject.SetActive(false);
             }
         }
     }

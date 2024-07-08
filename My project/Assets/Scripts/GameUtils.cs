@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -12,8 +13,13 @@ public class GameUtils
         aroundType,
     }
 
+    //存放敌人的位置，随时更新
+    public static int[][] enenyPos = new int[10][];
+
     //存放三个骰子的位置，并随时更新，骰子位置不能重叠
     public static int[][] randomPos = new int[3][];
+
+    public static int[,] blockNumArr = new int[6, 5];
 
     //随机创建1~6出三个随机数的数组
     public static int[] CreateRandomNum()
@@ -45,6 +51,7 @@ public class GameUtils
         return randomPos;
     }
 
+    //随机生成骰子类型
     public static rollType CreateRandomType()
     {
         rollType[] allTypes = (rollType[])System.Enum.GetValues(typeof(rollType));
@@ -53,6 +60,7 @@ public class GameUtils
         return randomType;
     }
 
+    //查找骰子当前位置是否重复
     public static bool findPos(int x, int y)
     {
         for (int i = 0; i < randomPos.Length; i++)
@@ -65,6 +73,7 @@ public class GameUtils
         return false;
     }
 
+    //更新骰子位置
     public static void updatePos(int oldPosX, int oldPosY, int newPosX, int newPosY)
     {
         for (int i = 0; i < randomPos.Length; i++)
