@@ -65,14 +65,9 @@ public class RollController : MonoBehaviour
                     moveBlockFalse(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
                     selectedObject.GetComponent<RollController>().row = x;
                     selectedObject.GetComponent<RollController>().col = y;
-                    for (int i = 0; i < GameUtils.blockNumArr.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < GameUtils.blockNumArr.GetLength(1); j++)
-                        {
-                            GameUtils.blockNumArr[i, j] = 0;
-                        }
-                    }
+                    GameUtils.delBlockNumArr();
                     chessBoard.GetComponent<GameMainView>().setBlockNum();
+                    chessBoard.GetComponent<GameMainView>().updateBlockColor();
                     return blockTransform.position;
                 }
             }
@@ -86,12 +81,18 @@ public class RollController : MonoBehaviour
     {
         if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40)
         {
+            GameUtils.RemovePair(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
             return storageBoard.transform.position;
         }
         else
         {
             return beginPos;
         }
+    }
+
+    private Vector2 UseStorageRoll(Vector3 beginPos, Vector3 worldPos)
+    {
+        return beginPos;
     }
 
     //移动时更新背景颜色和数字为不可见
