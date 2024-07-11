@@ -2,21 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
     //基本属性
-    public int hp;
+    [SerializeField]
+    private int hp;
 
-    public int damage;
+    [SerializeField]
+    private int damage;
 
     public int row;
 
     public int col;
 
-    // public GameObject homeBase;
-
     public GameObject chessBoard;
+
+    public Slider slider;
 
     public void Start()
     {
@@ -26,20 +29,23 @@ public class Enemy : MonoBehaviour
     //敌人的攻击逻辑
     public void Attack()
     {
-        // if (col == 0)
-        // {
-        //     homeBase.GetComponent<HomeBase>().hp -= damage;
-        // }
+        if (row == 0)
+        {
+            slider.value -= damage;
+        }
     }
 
     //受到玩家攻击
     public void TakeDamage()
     {
         Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
-        hp -= int.Parse(blockTransform.GetChild(1).GetComponent<TextMeshPro>().text);
-        if (hp <= 0)
+        if (blockTransform != null)
         {
-            Die();
+            hp -= int.Parse(blockTransform.GetChild(1).GetComponent<TextMeshPro>().text);
+            if (hp <= 0)
+            {
+                Die();
+            }
         }
     }
 
@@ -56,15 +62,18 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
         chessBoard.GetComponent<GameMainView>().AddScore();
         chessBoard.GetComponent<GameMainView>().UpdateHisScore();
+        GameUtils.RemovePair(row, col);
     }
 
     //敌人回合开始时向前移动
     public void Move()
     {
+        GameUtils.RemovePair(row, col);
         if (row > 0)
         {
             row--;
             transform.position = chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position;
         }
+        GameUtils.AddPair(row, col);
     }
 }

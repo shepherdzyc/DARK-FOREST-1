@@ -15,7 +15,7 @@ public class GameMainView : MonoBehaviour
 
     public GameObject[] rolls;
 
-    public GameObject enemy;
+    public GameObject[] enemy;
 
     public GameObject curScoreObj;
 
@@ -25,26 +25,26 @@ public class GameMainView : MonoBehaviour
 
     private GameObject selectedObject;
 
+    private Transform chessBoardTransform;
+
     void Awake()
     {
         mainCamera = Camera.main;
+        chessBoardTransform = chessBoard.transform;  //缓存棋盘的Transform引用
     }
 
     void Start()
     {
         CreateEnemy();
         CreateRoll();  //for test
-        setBlockNum();
-        updateBlockColor();
+        SetBlockNum();
+        UpdateBlockColor();
     }
 
     void Update()
     {
-        if (Input.touchCount > 0)
-        {
-            DetectAttack();
-        }
-        updateBlockNum();
+        DetectAttack();
+        UpdateBlockNum();
     }
 
     //回合开始时创建三个骰子
@@ -56,11 +56,12 @@ public class GameMainView : MonoBehaviour
         {
             int x = randomPosArr[i][0];
             int y = randomPosArr[i][1];
-            GameUtils.rollType type = GameUtils.CreateRandomType();
+            GameUtils.RollType type = GameUtils.CreateRandomType();
             string blockName = "block_" + x.ToString() + y.ToString();
-            Transform blockTransform = chessBoard.transform.Find(blockName);
+            Transform blockTransform = chessBoardTransform.Find(blockName);
             if (blockTransform == null)
             {
+                Debug.LogError("Block transform not found: " + blockName);
                 return;
             }
             else
@@ -80,139 +81,138 @@ public class GameMainView : MonoBehaviour
     public void CreateEnemy()
     {
         //先写死 测试
-        GameObject newEnemy = Instantiate(enemy);
+        GameObject newEnemy = Instantiate(enemy[0]);
         GameUtils.enemysArr.Add(newEnemy);
         newEnemy.GetComponent<Enemy>().row = Random.Range(4, 6);
         newEnemy.GetComponent<Enemy>().col = Random.Range(0, 5);
         GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });  //for test
-        newEnemy.transform.position = chessBoard.transform.Find("block_" + newEnemy.GetComponent<Enemy>().row.ToString()
+        newEnemy.transform.position = chessBoardTransform.Find("block_" + newEnemy.GetComponent<Enemy>().row.ToString()
         + newEnemy.GetComponent<Enemy>().col.ToString()).position;
     }
 
-    //更新方块颜色
-    public void updateBlockColor()
+    private void UpdateBlock(int row, int col, int num, bool updateColor, bool updateNumber)
     {
-        if (GameUtils.rollsArr.Count == 0)
+        Transform blockTransform = chessBoardTransform.Find("block_" + row.ToString() + col.ToString());
+        if (blockTransform == null)
         {
+            Debug.LogError("未找到方块的 Transform: block_" + row.ToString() + col.ToString());
             return;
         }
-        for (int i = 0; i < GameUtils.rollsArr.Count; i++)
+        blockTransform.GetChild(0).gameObject.SetActive(updateColor);
+        if (updateNumber)
         {
-            GameUtils.rollType type = GameUtils.rollsArr[i].GetComponent<RollController>().type;
-            int row = GameUtils.rollsArr[i].GetComponent<RollController>().row;
-            int col = GameUtils.rollsArr[i].GetComponent<RollController>().col;
-            if (type == GameUtils.rollType.rowType)
+            int currentNum = GameUtils.blockNumArr[row, col] + num;
+            GameUtils.blockNumArr[row, col] = currentNum;
+            TextMeshPro textMeshPro = blockTransform.GetChild(1).GetComponent<TextMeshPro>();
+            textMeshPro.text = currentNum.ToString();
+            textMeshPro.gameObject.SetActive(currentNum != 0);
+        }
+        else
+        {
+            blockTransform.GetChild(1).gameObject.SetActive(false);
+        }
+    }
+
+    // 提取出的共有方法，用于更新块的颜色或数字
+    public void UpdateBlockBasedOnType(GameUtils.RollType type, int row, int col, int num, bool updateColor, bool updateNumber)
+    {
+        if (type == GameUtils.RollType.rowType)
+        {
+            for (int j = 0; j < 6; j++)
             {
-                for (int j = 0; j < 6; j++)
-                {
-                    string blockName = "block_" + j.ToString() + col.ToString();
-                    Transform blockTransform = chessBoard.transform.Find(blockName);
-                    blockTransform.GetChild(0).gameObject.SetActive(true);
-                }
+                UpdateBlock(j, col, num, updateColor, updateNumber);
             }
-            else if (type == GameUtils.rollType.colType)
+        }
+        else if (type == GameUtils.RollType.colType)
+        {
+            for (int j = 0; j < 5; j++)
             {
-                for (int j = 0; j < 5; j++)
-                {
-                    string blockName = "block_" + row.ToString() + j.ToString();
-                    Transform blockTransform = chessBoard.transform.Find(blockName);
-                    blockTransform.GetChild(0).gameObject.SetActive(true);
-                }
+                UpdateBlock(row, j, num, updateColor, updateNumber);
             }
-            else
+        }
+        else
+        {
+            UpdateBlock(row, col, num, updateColor, updateNumber);
+            if (row - 1 >= 0)
             {
-                Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
-                blockTransform.GetChild(0).gameObject.SetActive(true);
-                if (row - 1 >= 0)
-                {
-                    Transform blockTransform1 = chessBoard.transform.Find("block_" + (row - 1).ToString() + col.ToString());
-                    blockTransform1.GetChild(0).gameObject.SetActive(true);
-                }
-                if (row + 1 <= 5)
-                {
-                    Transform blockTransform2 = chessBoard.transform.Find("block_" + (row + 1).ToString() + col.ToString());
-                    blockTransform2.GetChild(0).gameObject.SetActive(true);
-                }
-                if (col - 1 >= 0)
-                {
-                    Transform blockTransform3 = chessBoard.transform.Find("block_" + row.ToString() + (col - 1).ToString());
-                    blockTransform3.GetChild(0).gameObject.SetActive(true);
-                }
-                if (col + 1 <= 4)
-                {
-                    Transform blockTransform4 = chessBoard.transform.Find("block_" + row.ToString() + (col + 1).ToString());
-                    blockTransform4.GetChild(0).gameObject.SetActive(true);
-                }
+                UpdateBlock(row - 1, col, num, updateColor, updateNumber);
+            }
+            if (row + 1 <= 5)
+            {
+                UpdateBlock(row + 1, col, num, updateColor, updateNumber);
+            }
+            if (col - 1 >= 0)
+            {
+                UpdateBlock(row, col - 1, num, updateColor, updateNumber);
+            }
+            if (col + 1 <= 4)
+            {
+                UpdateBlock(row, col + 1, num, updateColor, updateNumber);
             }
         }
     }
 
-    public void setBlockNum()
+    // 更新方块颜色方法
+    public void UpdateBlockColor()
     {
         if (GameUtils.rollsArr.Count == 0)
         {
             return;
         }
-        for (int i = 0; i < GameUtils.rollsArr.Count; i++)
+
+        foreach (var roll in GameUtils.rollsArr)
         {
-            GameUtils.rollType type = GameUtils.rollsArr[i].GetComponent<RollController>().type;
-            int row = GameUtils.rollsArr[i].GetComponent<RollController>().row;
-            int col = GameUtils.rollsArr[i].GetComponent<RollController>().col;
-            int num = GameUtils.rollsArr[i].GetComponent<RollController>().num;
-            if (type == GameUtils.rollType.rowType)
-            {
-                for (int j = 0; j < 6; j++)
-                {
-                    GameUtils.blockNumArr[j, col] += num;
-                }
-            }
-            else if (type == GameUtils.rollType.colType)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    GameUtils.blockNumArr[row, j] += num;
-                }
-            }
-            else
-            {
-                GameUtils.blockNumArr[row, col] += num;
-                if (row - 1 >= 0)
-                {
-                    GameUtils.blockNumArr[row - 1, col] += num;
-                }
-                if (row + 1 <= 5)
-                {
-                    GameUtils.blockNumArr[row + 1, col] += num;
-                }
-                if (col - 1 >= 0)
-                {
-                    GameUtils.blockNumArr[row, col - 1] += num;
-                }
-                if (col + 1 <= 4)
-                {
-                    GameUtils.blockNumArr[row, col + 1] += num;
-                }
-            }
+            GameUtils.RollType type = roll.GetComponent<RollController>().type;
+            int row = roll.GetComponent<RollController>().row;
+            int col = roll.GetComponent<RollController>().col;
+
+            UpdateBlockBasedOnType(type, row, col, 0, true, false);
+        }
+    }
+
+    // 设置块的数字方法
+    public void SetBlockNum()
+    {
+        if (GameUtils.rollsArr.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var roll in GameUtils.rollsArr)
+        {
+            GameUtils.RollType type = roll.GetComponent<RollController>().type;
+            int row = roll.GetComponent<RollController>().row;
+            int col = roll.GetComponent<RollController>().col;
+            int num = roll.GetComponent<RollController>().num;
+
+            UpdateBlockBasedOnType(type, row, col, num, false, true);
         }
     }
 
     //更新方块数值
-    public void updateBlockNum()
+    public void UpdateBlockNum()
     {
         for (int i = 0; i < GameUtils.blockNumArr.GetLength(0); i++)
         {
             for (int j = 0; j < GameUtils.blockNumArr.GetLength(1); j++)
             {
-                Transform blockTransform = chessBoard.transform.Find("block_" + i.ToString() + j.ToString());
-                if (GameUtils.blockNumArr[i, j] != 0)
+                Transform blockTransform = chessBoardTransform.Find("block_" + i.ToString() + j.ToString());
+                if (blockTransform != null)
                 {
-                    blockTransform.GetChild(1).gameObject.SetActive(true);
-                    blockTransform.GetChild(1).GetComponent<TextMeshPro>().text = GameUtils.blockNumArr[i, j].ToString();
+                    if (GameUtils.blockNumArr[i, j] != 0)
+                    {
+                        blockTransform.GetChild(1).gameObject.SetActive(true);
+                        blockTransform.GetChild(1).GetComponent<TextMeshPro>().text = GameUtils.blockNumArr[i, j].ToString();
+                    }
+                    else
+                    {
+                        blockTransform.GetChild(1).GetComponent<TextMeshPro>().text = 0.ToString();
+                        blockTransform.GetChild(1).gameObject.SetActive(false);
+                    }
                 }
                 else
                 {
-                    blockTransform.GetChild(1).GetComponent<TextMeshPro>().text = 0.ToString();
-                    blockTransform.GetChild(1).gameObject.SetActive(false);
+                    Debug.LogError("Error!");
                 }
             }
         }
@@ -221,10 +221,23 @@ public class GameMainView : MonoBehaviour
     //检测是否按下攻击键
     public void DetectAttack()
     {
-        Touch touch = Input.GetTouch(0);
-        if (touch.phase == TouchPhase.Began)
+        if (Input.touchCount > 0)
         {
-            RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(touch.position), Vector2.zero);
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(touch.position), Vector2.zero);
+                if (hit.collider != null && hit.collider.gameObject.tag == "Attack")
+                {
+                    selectedObject = hit.collider.gameObject;
+                    PlayAttack();
+                }
+            }
+        }
+        //如果是在PC,Editor或web上
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
             if (hit.collider != null && hit.collider.gameObject.tag == "Attack")
             {
                 selectedObject = hit.collider.gameObject;
@@ -233,32 +246,31 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    private void setBlockColorFalse()
+    private void SetBlockColor()
     {
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 5; j++)
             {
-                Transform blockTransform = chessBoard.transform.Find("block_" + i.ToString() + j.ToString());
+                Transform blockTransform = chessBoardTransform.Find("block_" + i.ToString() + j.ToString());
                 blockTransform.GetChild(0).gameObject.SetActive(false);
             }
         }
     }
 
-    private void PlayFirstRound()
-    {
+    // private void PlayFirstRound()
+    // {
 
-    }
+    // }
 
     //回合结束时销毁除存储骰子外所有骰子
     public void DestroyRoll()
     {
-        for (int i = 0; i < GameUtils.rollsArr.Count; i++)
+        foreach (var roll in GameUtils.rollsArr)
         {
-            Destroy(GameUtils.rollsArr[i]);
-            GameUtils.rollsArr.RemoveAt(i);
-            i--;
+            Destroy(roll);
         }
+        GameUtils.rollsArr.Clear();
     }
 
     //
@@ -268,26 +280,20 @@ public class GameMainView : MonoBehaviour
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().TakeDamage();
         }
-        delPosArr();
+        DelPosArr();
         DestroyRoll();
         GameUtils.delBlockNumArr();
         PlayAIRound();
     }
 
 
-    //回合结束时销毁pos数组中所有骰子和敌人的索引
-    public void delPosArr()
+    //回合结束时销毁pos数组中所有骰子的索引
+    public void DelPosArr()
     {
         for (int i = 0; i < GameUtils.rollsArr.Count; i++)
         {
             int row = GameUtils.rollsArr[i].GetComponent<RollController>().row;
             int col = GameUtils.rollsArr[i].GetComponent<RollController>().col;
-            GameUtils.RemovePair(row, col);
-        }
-        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
-        {
-            int row = GameUtils.enemysArr[i].GetComponent<Enemy>().row;
-            int col = GameUtils.enemysArr[i].GetComponent<Enemy>().col;
             GameUtils.RemovePair(row, col);
         }
     }
@@ -297,6 +303,7 @@ public class GameMainView : MonoBehaviour
     {
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
+            GameUtils.enemysArr[i].GetComponent<Enemy>().Attack();
             GameUtils.enemysArr[i].GetComponent<Enemy>().Move();
         }
         NextRound();
@@ -305,11 +312,11 @@ public class GameMainView : MonoBehaviour
     //进行下一个回合
     public void NextRound()
     {
-        CreateRoll();  //for test
-        CreateEnemy();
-        setBlockNum();
-        setBlockColorFalse();
-        updateBlockColor();
+        CreateEnemy();  //先创建敌人数组，防止随后创建的骰子和敌人重复
+        CreateRoll();
+        SetBlockNum();
+        SetBlockColor();
+        UpdateBlockColor();
     }
 
     public void AddScore()

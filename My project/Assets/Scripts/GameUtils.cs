@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameUtils
 {
-    public enum rollType
+    public enum RollType
     {
         rowType,
         colType,
@@ -14,11 +14,9 @@ public class GameUtils
     }
 
     //存放敌人的位置，随时更新
-    public static int[][] enenyPos = new int[10][];
+    // public static int[][] enenyPos = new int[10][];
 
-    //存放三个骰子的位置，并随时更新，骰子位置不能重叠
-    public static int[][] randomPos = new int[3][];
-
+    //棋盘数组
     public static int[,] blockNumArr = new int[6, 5];
 
     //存放棋盘上所有骰子
@@ -45,6 +43,7 @@ public class GameUtils
     //随机生成6行5列的三个坐标数组，确保坐标不重复
     public static int[][] CreateRandomPos()
     {
+        int[][] randomPos = new int[3][];
         System.Random rand = new System.Random();
         HashSet<(int, int)> coordinatesSet = new HashSet<(int, int)>();
         foreach (List<int> pair in posArr)
@@ -69,11 +68,11 @@ public class GameUtils
     }
 
     //随机生成骰子类型
-    public static rollType CreateRandomType()
+    public static RollType CreateRandomType()
     {
-        rollType[] allTypes = (rollType[])System.Enum.GetValues(typeof(rollType));
+        RollType[] allTypes = (RollType[])System.Enum.GetValues(typeof(RollType));
         int randomIndex = Random.Range(0, allTypes.Length);
-        rollType randomType = allTypes[randomIndex];
+        RollType randomType = allTypes[randomIndex];
         return randomType;
     }
 
@@ -107,13 +106,7 @@ public class GameUtils
     //将blockNumArr中所有数字归零
     public static void delBlockNumArr()
     {
-        for (int i = 0; i < blockNumArr.GetLength(0); i++)
-        {
-            for (int j = 0; j < blockNumArr.GetLength(1); j++)
-            {
-                blockNumArr[i, j] = 0;
-            }
-        }
+        blockNumArr = new int[6, 5];
     }
 
     //移除posArr中不需要的坐标
