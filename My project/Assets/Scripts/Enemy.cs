@@ -21,7 +21,15 @@ public class Enemy : MonoBehaviour
 
     public Slider slider;
 
+    public GameObject hpObj;
+
     public void Start()
+    {
+
+    }
+
+
+    public void Spawn()
     {
 
     }
@@ -46,12 +54,14 @@ public class Enemy : MonoBehaviour
             {
                 Die();
             }
+            UpdateHP();
         }
     }
 
-    public void Spawn()
+    //更新敌人血量
+    public void UpdateHP()
     {
-
+        hpObj.GetComponent<TextMeshPro>().text = hp.ToString();
     }
 
     //敌人死亡时的处理，增加游戏得分、销毁游戏对象、播放死亡动画等

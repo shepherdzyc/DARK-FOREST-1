@@ -19,6 +19,8 @@ public class RollController : MonoBehaviour
 
     public GameUtils.RollType type;
 
+    private bool isStorage = false;
+
     private void Update()
     {
         if (Input.touchCount > 0)
@@ -45,7 +47,11 @@ public class RollController : MonoBehaviour
                     break;
 
                 case TouchPhase.Ended:
-                    selectedObject = null;
+                    if (selectedObject != null)
+                    {
+                        // 移动结束时更新游戏主视图的方块状态
+                        selectedObject = null;
+                    }
                     break;
             }
         }
@@ -81,13 +87,28 @@ public class RollController : MonoBehaviour
                 {
                     Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
                     worldPos.z = selectedObject.transform.position.z;
-                    Vector3 blockPos = getBoardPos(selectedObject.transform.position, worldPos);
-                    selectedObject.transform.position = blockPos;
+                    if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40 && !isStorage)
+                    {
+                        storageRoll();
+                        selectedObject.transform.position = storageBoard.transform.position;
+                    }
+                    else if (selectedObject.transform.position == storageBoard.transform.position && isStorage)
+                    {
+                        UseStorageRoll(worldPos);
+                    }
+                    else
+                    {
+                        selectedObject.transform.position = getBoardPos(selectedObject.transform.position, worldPos);
+                    }
                 }
                 break;
 
             case TouchPhase.Ended:
-                selectedObject = null;
+                if (selectedObject != null)
+                {
+                    // 移动结束时更新游戏主视图的方块状态
+                    selectedObject = null;
+                }
                 break;
         }
     }
@@ -108,42 +129,65 @@ public class RollController : MonoBehaviour
                     selectedObject.GetComponent<RollController>().col = y;
                     GameUtils.delBlockNumArr();
                     chessBoard.GetComponent<GameMainView>().SetBlockNum();
-                    chessBoard.GetComponent<GameMainView>().UpdateBlockColor();
+                    chessBoard.GetComponent<GameMainView>().SetBlockColor();
+                    chessBoard.GetComponent<GameMainView>().UpdateBlockNum();
                     return blockTransform.position;
                 }
             }
         }
-        return storageRoll(beginPos, worldPos);
-    }
-
-    //存储棋盘上骰子
-    private Vector2 storageRoll(Vector3 beginPos, Vector3 worldPos)
-    {
-        int x = selectedObject.GetComponent<RollController>().row;
-        int y = selectedObject.GetComponent<RollController>().col;
-        int num = selectedObject.GetComponent<RollController>().num;
-        GameUtils.RollType type = selectedObject.GetComponent<RollController>().type;
-        if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40)
-        {
-            GameUtils.blockNumArr[x, y] = 0;
-            GameUtils.RemovePair(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
-            chessBoard.GetComponent<GameMainView>().UpdateBlockBasedOnType(type, x, y, num, false, false);
-            return storageBoard.transform.position;
-        }
-        else
-        {
-            return beginPos;
-        }
-    }
-
-    //使用已经存储起来的骰子
-    private Vector2 UseStorageRoll(Vector3 beginPos, Vector3 worldPos)
-    {
-        getBoardPos(beginPos, worldPos);
-        GameUtils.AddPair(row, col);
         return beginPos;
     }
 
+    //存储棋盘上骰子
+    private void storageRoll()
+    {
+        int x = selectedObject.GetComponent<RollController>().row;
+        int y = selectedObject.GetComponent<RollController>().col;
+        moveBlockFalse(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
+        GameUtils.rollsArr.Remove(selectedObject);
+        GameUtils.RemovePair(x, y);
+        GameUtils.delBlockNumArr();
+        chessBoard.GetComponent<GameMainView>().SetBlockNum();
+        chessBoard.GetComponent<GameMainView>().SetBlockColor();
+        chessBoard.GetComponent<GameMainView>().UpdateBlockNum();
+        isStorage = true;
+    }
+
+    //使用已经存储起来的骰子
+    private void UseStorageRoll(Vector3 worldPos)
+    {
+        for (int x = 0; x < 6; x++)
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                string blockName = "block_" + x.ToString() + y.ToString();
+                Transform blockTransform = chessBoard.transform.Find(blockName);
+                if (blockTransform != null && Vector2.Distance(worldPos, blockTransform.position) <= 40)
+                {
+                    bool alreadyChosen = GameUtils.findPos(x, y);
+                    if (alreadyChosen)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        selectedObject.transform.position = blockTransform.position;
+                        GameUtils.rollsArr.Add(selectedObject);
+                        selectedObject.GetComponent<RollController>().row = x;
+                        selectedObject.GetComponent<RollController>().col = y;
+                        GameUtils.AddPair(x, y);
+                        GameUtils.updatePos(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col, x, y);
+                        GameUtils.delBlockNumArr();
+                        chessBoard.GetComponent<GameMainView>().SetBlockNum();
+                        chessBoard.GetComponent<GameMainView>().SetBlockColor();
+                        chessBoard.GetComponent<GameMainView>().UpdateBlockNum();
+                        isStorage = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
     //移动时更新背景颜色和数字为不可见
     public void moveBlockFalse(int row, int col)
     {

@@ -38,13 +38,13 @@ public class GameMainView : MonoBehaviour
         CreateEnemy();
         CreateRoll();  //for test
         SetBlockNum();
-        UpdateBlockColor();
+        SetBlockColor();
+        UpdateBlockNum();
     }
 
     void Update()
     {
         DetectAttack();
-        UpdateBlockNum();
     }
 
     //回合开始时创建三个骰子
@@ -90,70 +90,8 @@ public class GameMainView : MonoBehaviour
         + newEnemy.GetComponent<Enemy>().col.ToString()).position;
     }
 
-    private void UpdateBlock(int row, int col, int num, bool updateColor, bool updateNumber)
-    {
-        Transform blockTransform = chessBoardTransform.Find("block_" + row.ToString() + col.ToString());
-        if (blockTransform == null)
-        {
-            Debug.LogError("未找到方块的 Transform: block_" + row.ToString() + col.ToString());
-            return;
-        }
-        blockTransform.GetChild(0).gameObject.SetActive(updateColor);
-        if (updateNumber)
-        {
-            int currentNum = GameUtils.blockNumArr[row, col] + num;
-            GameUtils.blockNumArr[row, col] = currentNum;
-            TextMeshPro textMeshPro = blockTransform.GetChild(1).GetComponent<TextMeshPro>();
-            textMeshPro.text = currentNum.ToString();
-            textMeshPro.gameObject.SetActive(currentNum != 0);
-        }
-        else
-        {
-            blockTransform.GetChild(1).gameObject.SetActive(false);
-        }
-    }
-
-    // 提取出的共有方法，用于更新块的颜色或数字
-    public void UpdateBlockBasedOnType(GameUtils.RollType type, int row, int col, int num, bool updateColor, bool updateNumber)
-    {
-        if (type == GameUtils.RollType.rowType)
-        {
-            for (int j = 0; j < 6; j++)
-            {
-                UpdateBlock(j, col, num, updateColor, updateNumber);
-            }
-        }
-        else if (type == GameUtils.RollType.colType)
-        {
-            for (int j = 0; j < 5; j++)
-            {
-                UpdateBlock(row, j, num, updateColor, updateNumber);
-            }
-        }
-        else
-        {
-            UpdateBlock(row, col, num, updateColor, updateNumber);
-            if (row - 1 >= 0)
-            {
-                UpdateBlock(row - 1, col, num, updateColor, updateNumber);
-            }
-            if (row + 1 <= 5)
-            {
-                UpdateBlock(row + 1, col, num, updateColor, updateNumber);
-            }
-            if (col - 1 >= 0)
-            {
-                UpdateBlock(row, col - 1, num, updateColor, updateNumber);
-            }
-            if (col + 1 <= 4)
-            {
-                UpdateBlock(row, col + 1, num, updateColor, updateNumber);
-            }
-        }
-    }
-
     // 更新方块颜色方法
-    public void UpdateBlockColor()
+    public void SetBlockColor()
     {
         if (GameUtils.rollsArr.Count == 0)
         {
@@ -218,9 +156,73 @@ public class GameMainView : MonoBehaviour
         }
     }
 
+    // 提取出的共用方法，用于更新块的颜色或数字
+    public void UpdateBlockBasedOnType(GameUtils.RollType type, int row, int col, int num, bool updateColor, bool updateNumber)
+    {
+        if (type == GameUtils.RollType.rowType)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                UpdateBlock(j, col, num, updateColor, updateNumber);
+            }
+        }
+        else if (type == GameUtils.RollType.colType)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                UpdateBlock(row, j, num, updateColor, updateNumber);
+            }
+        }
+        else
+        {
+            UpdateBlock(row, col, num, updateColor, updateNumber);
+            if (row - 1 >= 0)
+            {
+                UpdateBlock(row - 1, col, num, updateColor, updateNumber);
+            }
+            if (row + 1 <= 5)
+            {
+                UpdateBlock(row + 1, col, num, updateColor, updateNumber);
+            }
+            if (col - 1 >= 0)
+            {
+                UpdateBlock(row, col - 1, num, updateColor, updateNumber);
+            }
+            if (col + 1 <= 4)
+            {
+                UpdateBlock(row, col + 1, num, updateColor, updateNumber);
+            }
+        }
+    }
+
+    //共用方法，根据参数更新方块状态
+    private void UpdateBlock(int row, int col, int num, bool updateColor, bool updateNumber)
+    {
+        Transform blockTransform = chessBoardTransform.Find("block_" + row.ToString() + col.ToString());
+        if (blockTransform == null)
+        {
+            Debug.LogError("未找到方块的 Transform: block_" + row.ToString() + col.ToString());
+            return;
+        }
+        blockTransform.GetChild(0).gameObject.SetActive(updateColor);
+        if (updateNumber)
+        {
+            int currentNum = GameUtils.blockNumArr[row, col] + num;
+            GameUtils.blockNumArr[row, col] = currentNum;
+            TextMeshPro textMeshPro = blockTransform.GetChild(1).GetComponent<TextMeshPro>();
+            textMeshPro.text = currentNum.ToString();
+            textMeshPro.gameObject.SetActive(currentNum != 0);
+        }
+        else
+        {
+            blockTransform.GetChild(1).gameObject.SetActive(false);
+        }
+    }
+
     //检测是否按下攻击键
     public void DetectAttack()
     {
+        //在移动端上运行
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -234,7 +236,7 @@ public class GameMainView : MonoBehaviour
                 }
             }
         }
-        //如果是在PC,Editor或web上
+        //在PC,Editor或web上
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
@@ -246,7 +248,8 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    private void SetBlockColor()
+    //回合开始时取消所有方块颜色
+    private void SetBlockColorFalse()
     {
         for (int i = 0; i < 6; i++)
         {
@@ -273,7 +276,7 @@ public class GameMainView : MonoBehaviour
         GameUtils.rollsArr.Clear();
     }
 
-    //
+    //玩家点击攻击
     private void PlayAttack()
     {
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
@@ -312,13 +315,15 @@ public class GameMainView : MonoBehaviour
     //进行下一个回合
     public void NextRound()
     {
-        CreateEnemy();  //先创建敌人数组，防止随后创建的骰子和敌人重复
+        CreateEnemy();  //先创建敌人数组，防止随后创建的骰子位置和敌人重复
         CreateRoll();
         SetBlockNum();
+        SetBlockColorFalse();
         SetBlockColor();
-        UpdateBlockColor();
+        UpdateBlockNum();
     }
 
+    //消灭敌人后增加分数
     public void AddScore()
     {
         int score = int.Parse(curScoreObj.GetComponent<TextMeshPro>().text);
@@ -326,6 +331,7 @@ public class GameMainView : MonoBehaviour
         curScoreObj.GetComponent<TextMeshPro>().text = score.ToString();
     }
 
+    //更新历史总得分
     public void UpdateHisScore()
     {
         int curScore = int.Parse(curScoreObj.GetComponent<TextMeshPro>().text);
@@ -334,5 +340,23 @@ public class GameMainView : MonoBehaviour
         {
             hisScoreObj.GetComponent<TextMeshPro>().text = curScore.ToString();
         }
+    }
+
+    // Other variables and methods remain unchanged
+    public void ClearBlock(int row, int col)
+    {
+        Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
+        if (blockTransform == null)
+        {
+            Debug.LogError("未找到方块的 Transform: block_" + row + "_" + col);
+            return;
+        }
+
+        // Clear color and number visibility
+        blockTransform.GetChild(0).gameObject.SetActive(false);
+        blockTransform.GetChild(1).gameObject.SetActive(false);
+
+        // Clear blockNumArr based on row and col
+        GameUtils.blockNumArr[row, col] = 0;
     }
 }
