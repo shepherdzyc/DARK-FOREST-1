@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using ExcelDataReader;
+using System.IO;
 
 public class Enemy : MonoBehaviour
 {
     //基本属性
-    [SerializeField]
-    private int hp;
+    public int hp;
 
     [SerializeField]
     private int damage;
@@ -25,13 +26,7 @@ public class Enemy : MonoBehaviour
 
     public void Start()
     {
-
-    }
-
-
-    public void Spawn()
-    {
-
+        UpdateHP();
     }
 
     //敌人的攻击逻辑
@@ -42,6 +37,13 @@ public class Enemy : MonoBehaviour
             slider.value -= damage;
         }
     }
+
+    //敌人生成时的处理
+    public void Spawn()
+    {
+
+    }
+
 
     //受到玩家攻击
     public void TakeDamage()

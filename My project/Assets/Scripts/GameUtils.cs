@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -70,8 +72,8 @@ public class GameUtils
     //随机生成骰子类型
     public static RollType CreateRandomType()
     {
-        RollType[] allTypes = (RollType[])System.Enum.GetValues(typeof(RollType));
-        int randomIndex = Random.Range(0, allTypes.Length);
+        RollType[] allTypes = (RollType[])Enum.GetValues(typeof(RollType));
+        int randomIndex = UnityEngine.Random.Range(0, allTypes.Length);
         RollType randomType = allTypes[randomIndex];
         return randomType;
     }
@@ -133,5 +135,23 @@ public class GameUtils
             }
         }
         return false;
+    }
+
+    //解析带方括号的字符串
+    public static int[][] ParseIntArray2D(string input)
+    {
+        // 分割多个方括号
+        string[] arrayStrings = input.Split(new[] { "][" }, StringSplitOptions.RemoveEmptyEntries);
+        int[][] result = new int[arrayStrings.Length][];
+
+        for (int i = 0; i < arrayStrings.Length; i++)
+        {
+            // 移除首尾的方括号
+            string cleanedString = arrayStrings[i].Trim('[', ']');
+            // 分割并解析为整数数组
+            result[i] = cleanedString.Split(',').Select(int.Parse).ToArray();
+        }
+
+        return result;
     }
 }

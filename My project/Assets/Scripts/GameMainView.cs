@@ -1,5 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using ExcelDataReader;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -27,6 +31,8 @@ public class GameMainView : MonoBehaviour
 
     private Transform chessBoardTransform;
 
+    private int level = 1;
+
     void Awake()
     {
         mainCamera = Camera.main;
@@ -35,11 +41,7 @@ public class GameMainView : MonoBehaviour
 
     void Start()
     {
-        CreateEnemy();
-        CreateRoll();  //for test
-        SetBlockNum();
-        SetBlockColor();
-        UpdateBlockNum();
+
     }
 
     void Update()
@@ -47,7 +49,8 @@ public class GameMainView : MonoBehaviour
         DetectAttack();
     }
 
-    //回合开始时创建三个骰子
+    #region 回合内方法
+    // 回合开始时创建三个骰子
     public void CreateRoll()
     {
         int[] randomNumArr = GameUtils.CreateRandomNum();
@@ -77,18 +80,57 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //回合开始时随机创建敌人
+    // 回合开始时创建敌人
     public void CreateEnemy()
     {
-        //先写死 测试
-        GameObject newEnemy = Instantiate(enemy[0]);
-        GameUtils.enemysArr.Add(newEnemy);
-        newEnemy.GetComponent<Enemy>().row = Random.Range(4, 6);
-        newEnemy.GetComponent<Enemy>().col = Random.Range(0, 5);
-        GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });  //for test
-        newEnemy.transform.position = chessBoardTransform.Find("block_" + newEnemy.GetComponent<Enemy>().row.ToString()
-        + newEnemy.GetComponent<Enemy>().col.ToString()).position;
+        string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
+        var result = ReadCSVFile(filePath);
+        int[][] type = ParseData(result, 1);
+        int[][] hp = ParseData(result, 2);
+        int[][] pos = ParseData(result, 3);
+        InstantiateEnemies(type.Length, hp, pos);
+        level++;
     }
+
+    // 读取CSV文件，返回数据集
+    private DataSet ReadCSVFile(string filePath)
+    {
+        using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+        {
+            using (var reader = ExcelReaderFactory.CreateCsvReader(stream))
+            {
+                return reader.AsDataSet();
+            }
+        }
+    }
+
+    //解析数据集，返回数组
+    private int[][] ParseData(DataSet data, int columnIndex)
+    {
+        return GameUtils.ParseIntArray2D(data.Tables[0].Rows[level][columnIndex].ToString());
+    }
+
+    // 根据获取的数据，实例化敌人对象
+    private void InstantiateEnemies(int count, int[][] hp, int[][] pos)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            GameObject newEnemy = Instantiate(enemy[0]);
+            UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), hp[i], pos[i], i == 0 ? 4 : 5);
+            GameUtils.enemysArr.Add(newEnemy);
+            GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+        }
+    }
+
+    // 更新敌人属性，包括HP、位置和行数
+    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int[] pos, int row)
+    {
+        enemy.row = row;
+        enemy.col = pos[0];
+        enemy.hp = UnityEngine.Random.Range(hpRange[0], hpRange[1]);
+        enemy.transform.position = chessBoardTransform.Find("block_" + enemy.row + enemy.col).position;
+    }
+
 
     // 更新方块颜色方法
     public void SetBlockColor()
@@ -248,34 +290,6 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //回合开始时取消所有方块颜色
-    private void SetBlockColorFalse()
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 5; j++)
-            {
-                Transform blockTransform = chessBoardTransform.Find("block_" + i.ToString() + j.ToString());
-                blockTransform.GetChild(0).gameObject.SetActive(false);
-            }
-        }
-    }
-
-    // private void PlayFirstRound()
-    // {
-
-    // }
-
-    //回合结束时销毁除存储骰子外所有骰子
-    public void DestroyRoll()
-    {
-        foreach (var roll in GameUtils.rollsArr)
-        {
-            Destroy(roll);
-        }
-        GameUtils.rollsArr.Clear();
-    }
-
     //玩家点击攻击
     private void PlayAttack()
     {
@@ -289,6 +303,30 @@ public class GameMainView : MonoBehaviour
         PlayAIRound();
     }
 
+    //回合开始时取消所有方块颜色
+    private void SetBlockColorFalse()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < 5; j++)
+            {
+                Transform blockTransform = chessBoardTransform.Find("block_" + i.ToString() + j.ToString());
+                blockTransform.GetChild(0).gameObject.SetActive(false);
+            }
+        }
+    }
+
+    #endregion
+
+    //回合结束时销毁除存储骰子外所有骰子
+    public void DestroyRoll()
+    {
+        foreach (var roll in GameUtils.rollsArr)
+        {
+            Destroy(roll);
+        }
+        GameUtils.rollsArr.Clear();
+    }
 
     //回合结束时销毁pos数组中所有骰子的索引
     public void DelPosArr()
@@ -299,6 +337,35 @@ public class GameMainView : MonoBehaviour
             int col = GameUtils.rollsArr[i].GetComponent<RollController>().col;
             GameUtils.RemovePair(row, col);
         }
+    }
+
+    // 游戏结束后统一清楚棋盘上所有骰子
+    public void ClearBlock(int row, int col)
+    {
+        Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
+        if (blockTransform == null)
+        {
+            Debug.LogError("未找到方块的 Transform: block_" + row + "_" + col);
+            return;
+        }
+
+        // Clear color and number visibility
+        blockTransform.GetChild(0).gameObject.SetActive(false);
+        blockTransform.GetChild(1).gameObject.SetActive(false);
+
+        // Clear blockNumArr based on row and col
+        GameUtils.blockNumArr[row, col] = 0;
+    }
+
+    #region 回合逻辑
+    //开始第一个回合
+    private void PlayFirstRound()
+    {
+        CreateEnemy();
+        CreateRoll();  //for test
+        SetBlockNum();
+        SetBlockColor();
+        UpdateBlockNum();
     }
 
     //轮到AI的回合
@@ -323,6 +390,9 @@ public class GameMainView : MonoBehaviour
         UpdateBlockNum();
     }
 
+    #endregion
+
+    #region 分数相关
     //消灭敌人后增加分数
     public void AddScore()
     {
@@ -342,21 +412,5 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    // Other variables and methods remain unchanged
-    public void ClearBlock(int row, int col)
-    {
-        Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
-        if (blockTransform == null)
-        {
-            Debug.LogError("未找到方块的 Transform: block_" + row + "_" + col);
-            return;
-        }
-
-        // Clear color and number visibility
-        blockTransform.GetChild(0).gameObject.SetActive(false);
-        blockTransform.GetChild(1).gameObject.SetActive(false);
-
-        // Clear blockNumArr based on row and col
-        GameUtils.blockNumArr[row, col] = 0;
-    }
+    #endregion
 }
