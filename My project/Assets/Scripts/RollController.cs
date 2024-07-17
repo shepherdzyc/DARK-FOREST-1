@@ -19,10 +19,35 @@ public class RollController : MonoBehaviour
 
     public GameUtils.RollType type;
 
+    public GameObject midPos;
+
     private bool isStorage = false;
+
+    [SerializeField]
+    private float speed = 500f;  // 初始速度
+
+    [SerializeField]
+    private float angle = 45.0f;  // 发射角度
+
+    private bool isMoving = false;  // 用于跟踪骰子是否正在移动
+
+    void Start()
+    {
+        transform.position = new Vector3(-500, 0, 0);
+        StartParabolaMove();
+    }
+
+    private void FixedUpdate()
+    {
+    }
 
     private void Update()
     {
+        if (isMoving)
+        {
+            return;  // 如果骰子正在移动，禁止拖动
+        }
+
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -70,6 +95,7 @@ public class RollController : MonoBehaviour
             HandleTouchEvents(Input.mousePosition, TouchPhase.Moved);
         }
     }
+
     private void HandleTouchEvents(Vector3 position, TouchPhase phase)
     {
         switch (phase)
@@ -112,6 +138,8 @@ public class RollController : MonoBehaviour
                 break;
         }
     }
+
+    //骰子移动时的判断
     private Vector2 getBoardPos(Vector3 beginPos, Vector3 worldPos)
     {
         for (int x = 0; x < 6; x++)
@@ -241,5 +269,37 @@ public class RollController : MonoBehaviour
                 blockTransform4.GetChild(1).gameObject.SetActive(false);
             }
         }
+    }
+
+    public void StartParabolaMove()
+    {
+        string blockName = "block_" + row.ToString() + col.ToString();
+        Transform blockTransform = chessBoard.transform.Find(blockName);
+        Vector2 start = transform.position;
+        Vector2 end = blockTransform.position;
+        float journeyLength = Vector2.Distance(start, end);
+        angle *= Mathf.Deg2Rad; // 把角度转为弧度
+
+        isMoving = true;  // 开始移动时设置为true
+        StartCoroutine(MoveAlongParabola(start, end, journeyLength));
+    }
+    private IEnumerator MoveAlongParabola(Vector2 start, Vector2 end, float journeyLength)
+    {
+        float time = 0f;
+        float totalTime = journeyLength / speed; // 总移动时间
+
+        while (time < totalTime)
+        {
+            float fracJourney = time / totalTime;
+            time += Time.deltaTime;
+
+            float height = Mathf.Sin(fracJourney * Mathf.PI) * journeyLength / 2;
+            transform.position = Vector2.Lerp(start, end, fracJourney) + Vector2.up * height;
+
+            yield return null;
+        }
+
+        transform.position = end; // 确保物体移动到完全的结束位置
+        isMoving = false;  // 移动结束时设置为false
     }
 }

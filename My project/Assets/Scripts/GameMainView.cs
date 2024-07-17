@@ -41,7 +41,7 @@ public class GameMainView : MonoBehaviour
 
     void Start()
     {
-
+        PlayFirstRound();
     }
 
     void Update()
@@ -75,7 +75,7 @@ public class GameMainView : MonoBehaviour
                 newRoll.GetComponent<RollController>().num = randomNumArr[i];
                 newRoll.GetComponent<RollController>().type = type;
                 GameUtils.rollsArr.Add(newRoll);
-                newRoll.transform.position = blockTransform.position;
+                // newRoll.transform.position = blockTransform.position;
             }
         }
     }
@@ -88,7 +88,7 @@ public class GameMainView : MonoBehaviour
         int[][] type = ParseData(result, 1);
         int[][] hp = ParseData(result, 2);
         int[][] pos = ParseData(result, 3);
-        InstantiateEnemies(type.Length, hp, pos);
+        InstantiateEnemies(type, hp, pos);
         level++;
     }
 
@@ -111,22 +111,25 @@ public class GameMainView : MonoBehaviour
     }
 
     // 根据获取的数据，实例化敌人对象
-    private void InstantiateEnemies(int count, int[][] hp, int[][] pos)
+    private void InstantiateEnemies(int[][] type, int[][] hp, int[][] pos)
     {
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < type.Length; i++)
         {
-            GameObject newEnemy = Instantiate(enemy[0]);
-            UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), hp[i], pos[i], i == 0 ? 4 : 5);
-            GameUtils.enemysArr.Add(newEnemy);
-            GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+            for (int j = 0; j < type[0].Length; j++)
+            {
+                GameObject newEnemy = Instantiate(enemy[0]);  //先用0，之后再用type中的类型
+                UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][j], hp[i][j + 1] }, pos[i][j], i == 0 ? 4 : 5);
+                GameUtils.enemysArr.Add(newEnemy);
+                GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+            }
         }
     }
 
     // 更新敌人属性，包括HP、位置和行数
-    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int[] pos, int row)
+    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int pos, int row)
     {
         enemy.row = row;
-        enemy.col = pos[0];
+        enemy.col = pos;
         enemy.hp = UnityEngine.Random.Range(hpRange[0], hpRange[1]);
         enemy.transform.position = chessBoardTransform.Find("block_" + enemy.row + enemy.col).position;
     }
