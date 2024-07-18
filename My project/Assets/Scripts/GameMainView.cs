@@ -312,7 +312,7 @@ public class GameMainView : MonoBehaviour
         StartCoroutine(PlayAIRound());
     }
 
-    //回合开始时取消所有方块颜色
+    //取消所有方块颜色
     private void SetBlockColorFalse()
     {
         for (int i = 0; i < 6; i++)
@@ -381,6 +381,11 @@ public class GameMainView : MonoBehaviour
     //轮到AI的回合
     private IEnumerator PlayAIRound()
     {
+        SetBlockNum();
+        SetBlockColorFalse();
+        SetBlockColor();
+        UpdateBlockNum();
+
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().Attack();

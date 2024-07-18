@@ -494,7 +494,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter text...
+  m_text: "\u8BF7\u8F93\u5165\u73A9\u5BB6\u59D3\u540D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5355a6d8f6f6a8e4c8b6a687b2074581, type: 2}
   m_sharedMaterial: {fileID: -5665461556018757553, guid: 5355a6d8f6f6a8e4c8b6a687b2074581, type: 2}
@@ -527,7 +527,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 2
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -836,8 +836,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 333.08057, y: 39.281017}
-  m_SizeDelta: {x: 243.1263, y: 58.3385}
+  m_AnchoredPosition: {x: 346.9912, y: 39.281017}
+  m_SizeDelta: {x: 270.9476, y: 58.3385}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1733040918
 MonoBehaviour:
@@ -897,7 +897,7 @@ MonoBehaviour:
   m_CharacterValidation: 0
   m_RegexValue: 
   m_GlobalPointSize: 36
-  m_CharacterLimit: 0
+  m_CharacterLimit: 5
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls: []
