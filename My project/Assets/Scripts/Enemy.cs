@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ExcelDataReader;
 using System.IO;
+using UnityEngine.UIElements;
 
 public class Enemy : MonoBehaviour
 {
@@ -18,9 +19,15 @@ public class Enemy : MonoBehaviour
 
     public int col;
 
+    public int score;  //消灭敌人增加的分数
+
+    //移动速度
+    [SerializeField]
+    private float moveSpeed = 50f;
+
     public GameObject chessBoard;
 
-    public Slider slider;
+    public UnityEngine.UI.Slider slider;
 
     public GameObject hpObj;
 
@@ -77,15 +84,35 @@ public class Enemy : MonoBehaviour
         GameUtils.RemovePair(row, col);
     }
 
-    //敌人回合开始时向前移动
+    // 敌人回合开始时向前移动
     public void Move()
     {
         GameUtils.RemovePair(row, col);
         if (row > 0)
         {
             row--;
-            transform.position = chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position;
+            StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
         }
+        Debug.Log(row);
         GameUtils.AddPair(row, col);
+    }
+
+    //敌人沿x轴移动过程
+    IEnumerator MoveAnim(Vector3 target)
+    {
+        Vector3 startPosition = transform.position;
+        float journey = 0f;
+        float duration = 1f; // 移动所需时间，可以根据需要调整
+
+        while (journey < duration)
+        {
+            journey += Time.deltaTime;
+            float percent = Mathf.Clamp01(journey / duration);
+            transform.position = Vector3.Lerp(startPosition, target, percent);
+            yield return null;
+        }
+
+        // 确保最后位置精确设置为目标位置
+        transform.position = target;
     }
 }

@@ -264,7 +264,7 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //检测是否按下攻击键
+    //检测是否按下攻击键  MARK:应该加一个判断骰子是否存在，如果不存在，无法按下攻击键
     public void DetectAttack()
     {
         //在移动端上运行
@@ -277,6 +277,7 @@ public class GameMainView : MonoBehaviour
                 if (hit.collider != null && hit.collider.gameObject.tag == "Attack")
                 {
                     selectedObject = hit.collider.gameObject;
+                    Debug.Log(1);
                     PlayAttack();
                 }
             }
@@ -300,10 +301,11 @@ public class GameMainView : MonoBehaviour
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().TakeDamage();
         }
+        Debug.Log("PlayAttack called");
         DelPosArr();
         DestroyRoll();
         GameUtils.delBlockNumArr();
-        PlayAIRound();
+        StartCoroutine(PlayAIRound());
     }
 
     //回合开始时取消所有方块颜色
@@ -342,7 +344,7 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    // 游戏结束后统一清楚棋盘上所有骰子
+    // 游戏结束后统一清除棋盘上所有骰子
     public void ClearBlock(int row, int col)
     {
         Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
@@ -352,11 +354,11 @@ public class GameMainView : MonoBehaviour
             return;
         }
 
-        // Clear color and number visibility
+        // 清除的颜色和数字可见性
         blockTransform.GetChild(0).gameObject.SetActive(false);
         blockTransform.GetChild(1).gameObject.SetActive(false);
 
-        // Clear blockNumArr based on row and col
+        // 清楚blockNumArr数组的所有元素
         GameUtils.blockNumArr[row, col] = 0;
     }
 
@@ -365,25 +367,26 @@ public class GameMainView : MonoBehaviour
     private void PlayFirstRound()
     {
         CreateEnemy();
-        CreateRoll();  //for test
+        CreateRoll();  //for test 
         SetBlockNum();
         SetBlockColor();
         UpdateBlockNum();
     }
 
     //轮到AI的回合
-    public void PlayAIRound()
+    private IEnumerator PlayAIRound()
     {
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().Attack();
             GameUtils.enemysArr[i].GetComponent<Enemy>().Move();
         }
-        NextRound();
+        yield return new WaitForSeconds(1f);
+        StartCoroutine(NextRound());
     }
 
     //进行下一个回合
-    public void NextRound()
+    private IEnumerator NextRound()
     {
         CreateEnemy();  //先创建敌人数组，防止随后创建的骰子位置和敌人重复
         CreateRoll();
@@ -391,6 +394,8 @@ public class GameMainView : MonoBehaviour
         SetBlockColorFalse();
         SetBlockColor();
         UpdateBlockNum();
+
+        yield return null;
     }
 
     #endregion
