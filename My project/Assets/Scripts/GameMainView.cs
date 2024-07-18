@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading.Tasks;
 using ExcelDataReader;
 using TMPro;
 using Unity.VisualScripting;
@@ -33,6 +34,8 @@ public class GameMainView : MonoBehaviour
 
     private int level = 1;
 
+    public GameObject enemyPos;
+
     void Awake()
     {
         mainCamera = Camera.main;
@@ -41,7 +44,7 @@ public class GameMainView : MonoBehaviour
 
     void Start()
     {
-        PlayFirstRound();
+        StartCoroutine(PlayFirstRound());
     }
 
     void Update()
@@ -131,7 +134,8 @@ public class GameMainView : MonoBehaviour
         enemy.row = row;
         enemy.col = pos;
         enemy.hp = UnityEngine.Random.Range(hpRange[0], hpRange[1]);
-        enemy.transform.position = chessBoardTransform.Find("block_" + enemy.row + enemy.col).position;
+        enemy.transform.position = enemyPos.transform.Find("block_" + "5" + enemy.col).position;
+        enemy.Move(true);
     }
 
 
@@ -364,9 +368,10 @@ public class GameMainView : MonoBehaviour
 
     #region 回合逻辑
     //开始第一个回合
-    private void PlayFirstRound()
+    private IEnumerator PlayFirstRound()
     {
         CreateEnemy();
+        yield return new WaitForSeconds(1f);
         CreateRoll();  //for test 
         SetBlockNum();
         SetBlockColor();
@@ -379,7 +384,6 @@ public class GameMainView : MonoBehaviour
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().Attack();
-            GameUtils.enemysArr[i].GetComponent<Enemy>().Move();
         }
         yield return new WaitForSeconds(1f);
         StartCoroutine(NextRound());
@@ -388,19 +392,21 @@ public class GameMainView : MonoBehaviour
     //进行下一个回合
     private IEnumerator NextRound()
     {
+        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
+        {
+            GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
+        }
         CreateEnemy();  //先创建敌人数组，防止随后创建的骰子位置和敌人重复
+        yield return new WaitForSeconds(1f);
         CreateRoll();
         SetBlockNum();
         SetBlockColorFalse();
         SetBlockColor();
         UpdateBlockNum();
-
-        yield return null;
     }
-
     #endregion
 
-    #region 分数相关
+    #region 分数和排行相关
     //消灭敌人后增加分数
     public void AddScore()
     {

@@ -85,16 +85,22 @@ public class Enemy : MonoBehaviour
     }
 
     // 敌人回合开始时向前移动
-    public void Move()
+    public void Move(bool isFirstCreated)
     {
-        GameUtils.RemovePair(row, col);
-        if (row > 0)
+        if (!isFirstCreated)
         {
-            row--;
+            GameUtils.RemovePair(row, col);
+            if (row > 0)
+            {
+                row--;
+                StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
+            }
+            GameUtils.AddPair(row, col);
+        }
+        else
+        {
             StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
         }
-        Debug.Log(row);
-        GameUtils.AddPair(row, col);
     }
 
     //敌人沿x轴移动过程

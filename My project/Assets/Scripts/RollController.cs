@@ -19,8 +19,6 @@ public class RollController : MonoBehaviour
 
     public GameUtils.RollType type;
 
-    public GameObject midPos;
-
     private bool isStorage = false;
 
     [SerializeField]
