@@ -41,7 +41,7 @@ public class GameMainView : MonoBehaviour
     void Awake()
     {
         mainCamera = Camera.main;
-        chessBoardTransform = chessBoard.transform;  //缓存棋盘的Transform引用
+        chessBoardTransform = chessBoard.transform;  // 缓存棋盘的Transform引用
     }
 
     void Start()
@@ -109,7 +109,7 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //解析数据集，返回数组
+    // 解析数据集，返回数组
     private int[][] ParseData(DataSet data, int columnIndex)
     {
         return GameUtils.ParseIntArray2D(data.Tables[0].Rows[level][columnIndex].ToString());
@@ -180,7 +180,7 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //更新方块数值
+    // 更新方块数值
     public void UpdateBlockNum()
     {
         for (int i = 0; i < GameUtils.blockNumArr.GetLength(0); i++)
@@ -248,7 +248,7 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //共用方法，根据参数更新方块状态
+    // 共用方法，根据参数更新方块状态
     private void UpdateBlock(int row, int col, int num, bool updateColor, bool updateNumber)
     {
         Transform blockTransform = chessBoardTransform.Find("block_" + row.ToString() + col.ToString());
@@ -272,10 +272,10 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //检测是否按下攻击键  MARK:应该加一个判断骰子是否存在，如果不存在，无法按下攻击键
+    // 检测是否按下攻击键  MARK:应该加一个判断骰子是否存在，如果不存在，无法按下攻击键
     public void DetectAttack()
     {
-        //在移动端上运行
+        // 在移动端上运行
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -290,7 +290,7 @@ public class GameMainView : MonoBehaviour
                 }
             }
         }
-        //在PC,Editor或web上
+        // 在PC,Editor或web上
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
@@ -302,11 +302,13 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    //玩家点击攻击
+    // 玩家点击攻击
     private void PlayAttack()
     {
-        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
+        // 倒序遍历数组 防止因删除敌人出错
+        for (int i = GameUtils.enemysArr.Count - 1; i >= 0; i--)
         {
+            Debug.Log(100);
             GameUtils.enemysArr[i].GetComponent<Enemy>().TakeDamage();
         }
         Debug.Log("PlayAttack called");
@@ -316,7 +318,7 @@ public class GameMainView : MonoBehaviour
         StartCoroutine(PlayAIRound());
     }
 
-    //取消所有方块颜色
+    // 取消所有方块颜色
     private void SetBlockColorFalse()
     {
         for (int i = 0; i < 6; i++)
@@ -331,7 +333,7 @@ public class GameMainView : MonoBehaviour
 
     #endregion
 
-    //回合结束时销毁除存储骰子外所有骰子
+    // 回合结束时销毁除存储骰子外所有骰子
     public void DestroyRoll()
     {
         foreach (var roll in GameUtils.rollsArr)
@@ -348,7 +350,7 @@ public class GameMainView : MonoBehaviour
         {
             int row = GameUtils.rollsArr[i].GetComponent<RollController>().row;
             int col = GameUtils.rollsArr[i].GetComponent<RollController>().col;
-            GameUtils.RemovePair(row, col);
+            GameUtils.RemovePosPair(row, col);
         }
     }
 
@@ -371,7 +373,7 @@ public class GameMainView : MonoBehaviour
     }
 
     #region 回合逻辑
-    //开始第一个回合
+    // 开始第一个回合
     private IEnumerator PlayFirstRound()
     {
         CreateEnemy();
@@ -382,7 +384,7 @@ public class GameMainView : MonoBehaviour
         UpdateBlockNum();
     }
 
-    //轮到AI的回合
+    // 轮到AI的回合
     private IEnumerator PlayAIRound()
     {
         SetBlockNum();
@@ -398,7 +400,7 @@ public class GameMainView : MonoBehaviour
         StartCoroutine(NextRound());
     }
 
-    //进行下一个回合
+    // 进行下一个回合
     private IEnumerator NextRound()
     {
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
@@ -416,7 +418,7 @@ public class GameMainView : MonoBehaviour
     #endregion
 
     #region 分数和排行相关
-    //消灭敌人后增加分数
+    // 消灭敌人后增加分数
     public void AddScore()
     {
         int score = int.Parse(curScoreObj.GetComponent<TextMeshPro>().text);
@@ -424,7 +426,7 @@ public class GameMainView : MonoBehaviour
         curScoreObj.GetComponent<TextMeshPro>().text = score.ToString();
     }
 
-    //更新历史总得分
+    // 更新历史总得分
     public void UpdateHisScore()
     {
         int curScore = int.Parse(curScoreObj.GetComponent<TextMeshPro>().text);

@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
 
     public int type;
 
-    public int score;  //消灭敌人增加的分数
+    public int score;  // 消灭敌人增加的分数
 
     public GameObject chessBoard;
 
@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour
 
     }
 
-    //初始化被创建出来的敌人
+    // 初始化被创建出来的敌人
     public void Initialize()
     {
         if (File.Exists(Path.Combine(Application.dataPath, "Resources/Arts/Enemy_" + type.ToString() + ".png")))
@@ -56,7 +56,7 @@ public class Enemy : MonoBehaviour
         UpdateHP();
     }
 
-    //敌人的攻击逻辑
+    // 敌人的攻击逻辑
     public void Attack()
     {
         if (row == 0)
@@ -65,14 +65,14 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    //敌人生成时的处理
+    // 敌人生成时的处理
     public void Spawn()
     {
 
     }
 
 
-    //受到玩家攻击
+    // 受到玩家攻击
     public void TakeDamage()
     {
         Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
@@ -82,26 +82,49 @@ public class Enemy : MonoBehaviour
             if (hp <= 0)
             {
                 Die();
+                return;
             }
             UpdateHP();
         }
     }
 
-    //更新敌人血量
+    // 更新敌人血量
     public void UpdateHP()
     {
         hpObj.GetComponent<TextMeshPro>().text = hp.ToString();
     }
 
-    //敌人死亡时的处理，增加游戏得分、销毁游戏对象、播放死亡动画等
-    public void Die()
+    // 敌人死亡时的处理，增加游戏得分、销毁游戏对象、播放死亡动画等
+    public virtual void Die()
     {
-        GameUtils.RemovePair(row, col);
+        GameUtils.RemovePosPair(row, col);
         GameUtils.enemysArr.Remove(gameObject);
         Destroy(gameObject);
         chessBoard.GetComponent<GameMainView>().AddScore();
         chessBoard.GetComponent<GameMainView>().UpdateHisScore();
-        GameUtils.RemovePair(row, col);
+    }
+
+    // 生成周围新的敌人
+    private void SpawnSurroundingEnemies()
+    {
+        if (type != 3)
+        {
+            return;
+        }
+        int[,] directions = new int[,]
+        {
+            {0,1},{0,-1},{-1,0}
+        };
+        for (int i = 0; i < directions.GetLength(0); i++)
+        {
+            int newRow = row + directions[i, 0];
+            int newCol = col + directions[i, 1];
+            if (!GameUtils.findPos(newRow, newCol))
+            {
+                // 生成敌人
+                // chessBoard.GetComponent<GameMainView>().CreateEnemy();
+            }
+        }
     }
 
     // 敌人回合开始时向前移动
@@ -109,13 +132,13 @@ public class Enemy : MonoBehaviour
     {
         if (!isFirstCreated)
         {
-            GameUtils.RemovePair(row, col);
+            GameUtils.RemovePosPair(row, col);
             if (row > 0)
             {
                 row--;
                 StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
             }
-            GameUtils.AddPair(row, col);
+            GameUtils.AddPosPair(row, col);
         }
         else
         {
@@ -123,7 +146,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    //敌人沿x轴移动过程
+    // 敌人沿x轴移动过程
     IEnumerator MoveAnim(Vector3 target)
     {
         Vector3 startPosition = transform.position;

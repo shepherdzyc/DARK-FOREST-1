@@ -168,7 +168,7 @@ public class RollController : MonoBehaviour
         int y = selectedObject.GetComponent<RollController>().col;
         moveBlockFalse(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col);
         GameUtils.rollsArr.Remove(selectedObject);
-        GameUtils.RemovePair(x, y);
+        GameUtils.RemovePosPair(x, y);
         GameUtils.delBlockNumArr();
         chessBoard.GetComponent<GameMainView>().SetBlockNum();
         chessBoard.GetComponent<GameMainView>().SetBlockColor();
@@ -198,7 +198,7 @@ public class RollController : MonoBehaviour
                         GameUtils.rollsArr.Add(selectedObject);
                         selectedObject.GetComponent<RollController>().row = x;
                         selectedObject.GetComponent<RollController>().col = y;
-                        GameUtils.AddPair(x, y);
+                        GameUtils.AddPosPair(x, y);
                         GameUtils.updatePos(selectedObject.GetComponent<RollController>().row, selectedObject.GetComponent<RollController>().col, x, y);
                         GameUtils.delBlockNumArr();
                         chessBoard.GetComponent<GameMainView>().SetBlockNum();

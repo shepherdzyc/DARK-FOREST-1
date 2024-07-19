@@ -15,22 +15,22 @@ public class GameUtils
         aroundType,
     }
 
-    //存放敌人的位置，随时更新
+    // 存放敌人的位置，随时更新
     // public static int[][] enenyPos = new int[10][];
 
-    //棋盘数组
+    // 棋盘数组
     public static int[,] blockNumArr = new int[6, 5];
 
-    //存放棋盘上所有骰子
+    // 存放棋盘上所有骰子
     public static List<GameObject> rollsArr = new List<GameObject>();
 
-    //存放棋盘上所有敌人
+    // 存放棋盘上所有敌人
     public static List<GameObject> enemysArr = new List<GameObject>();
 
-    //存放棋盘中已存在的位置
+    // 存放棋盘中已存在的位置
     public static List<List<int>> posArr = new List<List<int>>();
 
-    //随机创建1~6出三个随机数的数组
+    // 随机创建1~6出三个随机数的数组
     public static int[] CreateRandomNum()
     {
         int[] randomArr = new int[3];
@@ -42,7 +42,7 @@ public class GameUtils
         return randomArr;
     }
 
-    //随机生成6行5列的三个坐标数组，确保坐标不重复
+    // 随机生成6行5列的三个坐标数组，确保坐标不重复
     public static int[][] CreateRandomPos()
     {
         int[][] randomPos = new int[3][];
@@ -64,12 +64,12 @@ public class GameUtils
                 y = rand.Next(0, 5);
             } while (!coordinatesSet.Add((x, y)));
             randomPos[i] = new int[] { x, y };
-            AddPair(x, y);
+            AddPosPair(x, y);
         }
         return randomPos;
     }
 
-    //随机生成骰子类型
+    // 随机生成骰子类型
     public static RollType CreateRandomType()
     {
         RollType[] allTypes = (RollType[])Enum.GetValues(typeof(RollType));
@@ -78,7 +78,7 @@ public class GameUtils
         return randomType;
     }
 
-    //查找骰子当前位置是否重复
+    // 查找骰子当前位置是否重复
     public static bool findPos(int x, int y)
     {
         for (int i = 0; i < posArr.Count; i++)
@@ -91,7 +91,7 @@ public class GameUtils
         return false;
     }
 
-    //更新骰子位置
+    // 更新骰子位置
     public static void updatePos(int oldPosX, int oldPosY, int newPosX, int newPosY)
     {
         for (int i = 0; i < posArr.Count; i++)
@@ -105,26 +105,26 @@ public class GameUtils
         }
     }
 
-    //将blockNumArr中所有数字归零
+    // 将blockNumArr中所有数字归零
     public static void delBlockNumArr()
     {
         blockNumArr = new int[6, 5];
     }
 
-    //移除posArr中不需要的坐标
-    public static void RemovePair(int x, int y)
+    // 移除posArr中不需要的坐标
+    public static void RemovePosPair(int x, int y)
     {
         posArr.RemoveAll(pair => pair.Count == 2 && pair[0] == x && pair[1] == y);
     }
 
-    //向posArr中添加坐标
-    public static void AddPair(int x, int y)
+    // 向posArr中添加坐标
+    public static void AddPosPair(int x, int y)
     {
         List<int> pair = new List<int> { x, y };
         posArr.Add(pair);
     }
 
-    //检查posArr中是否已经存在坐标x和y
+    // 检查posArr中是否已经存在坐标x和y
     public static bool IsCoordinatePair(int x, int y)
     {
         foreach (List<int> pair in posArr)
@@ -137,7 +137,7 @@ public class GameUtils
         return false;
     }
 
-    //解析带方括号的字符串
+    // 解析带方括号的字符串
     public static int[][] ParseIntArray2D(string input)
     {
         // 分割多个方括号
