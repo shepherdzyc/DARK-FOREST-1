@@ -24,9 +24,6 @@ public class RollController : MonoBehaviour
     [SerializeField]
     private float speed = 500f;  // 初始速度
 
-    [SerializeField]
-    private float angle = 45.0f;  // 发射角度
-
     private bool isMoving = false;  // 用于跟踪骰子是否正在移动
 
     void Start()
@@ -269,6 +266,7 @@ public class RollController : MonoBehaviour
         }
     }
 
+    //使骰子能够沿着曲线进行运动
     public void StartParabolaMove()
     {
         string blockName = "block_" + row.ToString() + col.ToString();
@@ -276,11 +274,11 @@ public class RollController : MonoBehaviour
         Vector2 start = transform.position;
         Vector2 end = blockTransform.position;
         float journeyLength = Vector2.Distance(start, end);
-        angle *= Mathf.Deg2Rad; // 把角度转为弧度
 
         isMoving = true;  // 开始移动时设置为true
         StartCoroutine(MoveAlongParabola(start, end, journeyLength));
     }
+
     private IEnumerator MoveAlongParabola(Vector2 start, Vector2 end, float journeyLength)
     {
         float time = 0f;
@@ -291,7 +289,7 @@ public class RollController : MonoBehaviour
             float fracJourney = time / totalTime;
             time += Time.deltaTime;
 
-            float height = Mathf.Sin(fracJourney * Mathf.PI) * journeyLength / 2;
+            float height = Mathf.Sin(fracJourney * Mathf.PI) * journeyLength / 3;
             transform.position = Vector2.Lerp(start, end, fracJourney) + Vector2.up * height;
 
             yield return null;

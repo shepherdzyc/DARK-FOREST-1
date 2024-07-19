@@ -2183,7 +2183,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &407432730
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2484,52 +2483,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &441190243
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 441190245}
-  - component: {fileID: 441190244}
-  m_Layer: 0
-  m_Name: EnemyPoolManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &441190244
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441190243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75190eab9567d324db8aa47845e09aca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyPrefab: []
-  poolSize: 10
---- !u!4 &441190245
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441190243}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.028664455, y: 0.85388887, z: 0.06413212}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &444459028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3847,7 +3800,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &664148281
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4554,7 +4506,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &765551712
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5919,7 +5870,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &1047380736
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7072,7 +7022,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &1327775967
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7495,7 +7444,6 @@ MonoBehaviour:
   num: 0
   type: 0
   speed: 500
-  angle: 45
 --- !u!61 &1403156353
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9159,11 +9107,12 @@ MonoBehaviour:
   damage: 2
   row: 0
   col: 0
+  type: 0
   score: 0
-  moveSpeed: 50
   chessBoard: {fileID: 2008587366}
   slider: {fileID: 3316528}
   hpObj: {fileID: 1410600143}
+  sprite: {fileID: 21300000, guid: 797126093cc64e9459d0432eae45d74e, type: 3}
 --- !u!1 &1556179818
 GameObject:
   m_ObjectHideFlags: 0
@@ -9664,6 +9613,7 @@ GameObject:
   - component: {fileID: 1719620526}
   - component: {fileID: 1719620525}
   - component: {fileID: 1719620527}
+  - component: {fileID: 1719620528}
   m_Layer: 0
   m_Name: AttackBtn
   m_TagString: Attack
@@ -9784,6 +9734,62 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 235, y: 38}
   m_EdgeRadius: 0
+--- !u!114 &1719620528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719620524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 0}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2008587367}
+        m_TargetAssemblyTypeName: GameMainView, Assembly-CSharp
+        m_MethodName: DetectAttack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1729338043
 GameObject:
   m_ObjectHideFlags: 0
@@ -11432,37 +11438,6 @@ MeshRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &1960603177
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1960603178}
-  m_Layer: 0
-  m_Name: ControllPos
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1960603178
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1960603177}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -336, y: 232, z: -3.6021445}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1963890155
 GameObject:
   m_ObjectHideFlags: 0
@@ -11684,8 +11659,7 @@ MonoBehaviour:
   - {fileID: 664148276}
   - {fileID: 1327775962}
   - {fileID: 765551707}
-  enemy:
-  - {fileID: 1550821476}
+  enemy: {fileID: 1550821476}
   curScoreObj: {fileID: 709146077}
   hisScoreObj: {fileID: 334144406}
   enemyPos: {fileID: 1556179818}
@@ -12422,7 +12396,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 1375292312}
-  - {fileID: 441190245}
   - {fileID: 1276655615}
   - {fileID: 1719620526}
   - {fileID: 1875230185}
@@ -12432,5 +12405,4 @@ SceneRoots:
   - {fileID: 1550821478}
   - {fileID: 921361541}
   - {fileID: 776904581}
-  - {fileID: 1960603178}
   - {fileID: 1556179819}

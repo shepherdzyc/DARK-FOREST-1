@@ -20,7 +20,7 @@ public class GameMainView : MonoBehaviour
 
     public GameObject[] rolls;
 
-    public GameObject[] enemy;
+    public GameObject enemy;
 
     public GameObject curScoreObj;
 
@@ -31,6 +31,8 @@ public class GameMainView : MonoBehaviour
     private GameObject selectedObject;
 
     private Transform chessBoardTransform;
+
+    public GameObject[,] blocks;
 
     private int level = 1;
 
@@ -84,10 +86,10 @@ public class GameMainView : MonoBehaviour
     }
 
     // 回合开始时创建敌人
-    public void CreateEnemy()
+    public async void CreateEnemy()
     {
         string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
-        var result = ReadCSVFile(filePath);
+        var result = await ReadCSVFile(filePath);
         int[][] type = ParseData(result, 1);
         int[][] hp = ParseData(result, 2);
         int[][] pos = ParseData(result, 3);
@@ -95,14 +97,14 @@ public class GameMainView : MonoBehaviour
         level++;
     }
 
-    // 读取CSV文件，返回数据集
-    private DataSet ReadCSVFile(string filePath)
+    // 异步读取CSV文件，返回数据集
+    private async Task<DataSet> ReadCSVFile(string filePath)
     {
         using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
         {
             using (var reader = ExcelReaderFactory.CreateCsvReader(stream))
             {
-                return reader.AsDataSet();
+                return await Task.Run(() => reader.AsDataSet());
             }
         }
     }
@@ -120,8 +122,9 @@ public class GameMainView : MonoBehaviour
         {
             for (int j = 0; j < type[0].Length; j++)
             {
-                GameObject newEnemy = Instantiate(enemy[0]);  //先用0，之后再用type中的类型
-                UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][j], hp[i][j + 1] }, pos[i][j], i == 0 ? 4 : 5);
+                GameObject newEnemy = Instantiate(enemy);  //先用0，之后再用type中的类型
+                UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][j], hp[i][j + 1] }, pos[i][j], i == 0 ? 4 : 5, type[i][j]);
+                newEnemy.GetComponent<Enemy>().Initialize();
                 GameUtils.enemysArr.Add(newEnemy);
                 GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
             }
@@ -129,10 +132,11 @@ public class GameMainView : MonoBehaviour
     }
 
     // 更新敌人属性，包括HP、位置和行数
-    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int pos, int row)
+    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int pos, int row, int type)
     {
         enemy.row = row;
         enemy.col = pos;
+        enemy.type = type;
         enemy.hp = UnityEngine.Random.Range(hpRange[0], hpRange[1]);
         enemy.transform.position = enemyPos.transform.Find("block_" + "5" + enemy.col).position;
         enemy.Move(true);

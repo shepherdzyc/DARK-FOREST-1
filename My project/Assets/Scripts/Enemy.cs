@@ -19,11 +19,9 @@ public class Enemy : MonoBehaviour
 
     public int col;
 
-    public int score;  //消灭敌人增加的分数
+    public int type;
 
-    //移动速度
-    [SerializeField]
-    private float moveSpeed = 50f;
+    public int score;  //消灭敌人增加的分数
 
     public GameObject chessBoard;
 
@@ -31,8 +29,30 @@ public class Enemy : MonoBehaviour
 
     public GameObject hpObj;
 
-    public void Start()
+    private Sprite sprite;
+
+    private void Awake()
     {
+
+    }
+
+    private void Start()
+    {
+
+    }
+
+    //初始化被创建出来的敌人
+    public void Initialize()
+    {
+        if (File.Exists(Path.Combine(Application.dataPath, "Resources/Arts/Enemy_" + type.ToString() + ".png")))
+        {
+            sprite = Resources.Load<Sprite>("Arts/Enemy_" + type.ToString());
+            GetComponent<SpriteRenderer>().sprite = sprite;
+        }
+        else
+        {
+            Debug.Log("资源不存在");
+        }
         UpdateHP();
     }
 
