@@ -7,6 +7,9 @@ public class Leaderboard : MonoBehaviour
 {
     string leaderboardID = "23449";
     // Start is called before the first frame update
+
+    int score = 0;
+
     void Start()
     {
 
@@ -22,7 +25,7 @@ public class Leaderboard : MonoBehaviour
     {
         bool done = false;
         string playerID = PlayerPrefs.GetString("PlayerID");
-        LootLockerSDKManager.SubmitScore(playerID, scoreToUpload, leaderboardID, (response) =>
+        LootLockerSDKManager.SubmitScore(playerID, score, "globalHighscore", (response) =>
         {
             if (response.success)
             {

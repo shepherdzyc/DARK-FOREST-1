@@ -34,7 +34,7 @@ public class GameMainView : MonoBehaviour
 
     public GameObject[,] blocks;
 
-    private int level = 1;
+    private int level = 0;
 
     public GameObject enemyPos;
 
@@ -85,18 +85,6 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    // 回合开始时创建敌人
-    public async void CreateEnemy()
-    {
-        string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
-        var result = await ReadCSVFile(filePath);
-        int[][] type = ParseData(result, 1);
-        int[][] hp = ParseData(result, 2);
-        int[][] pos = ParseData(result, 3);
-        InstantiateEnemies(type, hp, pos);
-        level++;
-    }
-
     // 异步读取CSV文件，返回数据集
     private async Task<DataSet> ReadCSVFile(string filePath)
     {
@@ -109,24 +97,30 @@ public class GameMainView : MonoBehaviour
         }
     }
 
-    // 解析数据集，返回数组
-    private int[][] ParseData(DataSet data, int columnIndex)
+    // 回合开始时创建敌人
+    public async void CreateEnemy()
     {
-        return GameUtils.ParseIntArray2D(data.Tables[0].Rows[level][columnIndex].ToString());
-    }
-
-    // 根据获取的数据，实例化敌人对象
-    private void InstantiateEnemies(int[][] type, int[][] hp, int[][] pos)
-    {
-        for (int i = 0; i < type.Length; i++)
+        string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
+        var result = await ReadCSVFile(filePath);
+        for (int index = 0; index < 2; index++)
         {
-            for (int j = 0; j < type[0].Length; j++)
+            level++;
+            int[] type = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][1].ToString());
+            if (type.Length == 0)
             {
-                GameObject newEnemy = Instantiate(enemy);  //先用0，之后再用type中的类型
-                UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][j], hp[i][j + 1] }, pos[i][j], i == 0 ? 4 : 5, type[i][j]);
-                newEnemy.GetComponent<Enemy>().Initialize();
-                GameUtils.enemysArr.Add(newEnemy);
-                GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+                break;
+            }
+            int[][] hp = GameUtils.ParseIntArray2D(result.Tables[0].Rows[level][2].ToString());
+            int[] pos = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][3].ToString());
+            {
+                for (int i = 0; i < type.Length; i++)
+                {
+                    GameObject newEnemy = Instantiate(enemy);  //先用0，之后再用type中的类型
+                    UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][0], hp[i][1] }, pos[i], index == 0 ? 4 : 5, type[i]);
+                    newEnemy.GetComponent<Enemy>().Initialize();
+                    GameUtils.enemysArr.Add(newEnemy);
+                    GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+                }
             }
         }
     }
@@ -141,7 +135,6 @@ public class GameMainView : MonoBehaviour
         enemy.transform.position = enemyPos.transform.Find("block_" + "5" + enemy.col).position;
         enemy.Move(true);
     }
-
 
     // 更新方块颜色方法
     public void SetBlockColor()
@@ -265,10 +258,37 @@ public class GameMainView : MonoBehaviour
             TextMeshPro textMeshPro = blockTransform.GetChild(1).GetComponent<TextMeshPro>();
             textMeshPro.text = currentNum.ToString();
             textMeshPro.gameObject.SetActive(currentNum != 0);
+            Color newColor = GetColorForNumber(currentNum);
+            SpriteRenderer spriteRenderer = blockTransform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = newColor;
+            }
         }
         else
         {
             blockTransform.GetChild(1).gameObject.SetActive(false);
+        }
+    }
+
+    private Color GetColorForNumber(int number)
+    {
+        if (number > 6) number = 6;  // 确保 number 不超过 6
+
+        // 计算 alpha 值
+        int alpha = Mathf.Clamp((number - 1) * 40 + 40, 0, 255);
+        Color color = new Color(1, 1, 1, alpha / 255f);  // 白色但透明度根据 alpha 计算
+
+        return color;
+    }
+
+    // 对所有的敌人进行冰冻
+    private void Frozen()
+    {
+        // if()冰冻按钮被按下
+        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
+        {
+            GameUtils.enemysArr[i].GetComponent<Enemy>().isFrozen = true;
         }
     }
 

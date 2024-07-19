@@ -21,7 +21,9 @@ public class Enemy : MonoBehaviour
 
     public int type;
 
-    public int score;  // 消灭敌人增加的分数
+    public bool isFrozen = false; //增加敌人被冰冻状态
+
+    public int score; // 消灭敌人增加的分数
 
     public GameObject chessBoard;
 
@@ -130,6 +132,12 @@ public class Enemy : MonoBehaviour
     // 敌人回合开始时向前移动
     public void Move(bool isFirstCreated)
     {
+        // 如果被道具冰冻，则敌人无法移动
+        if (isFrozen)
+        {
+            isFrozen = false;
+            return;
+        }
         if (!isFirstCreated)
         {
             GameUtils.RemovePosPair(row, col);

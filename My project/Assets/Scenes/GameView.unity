@@ -9108,6 +9108,7 @@ MonoBehaviour:
   row: 0
   col: 0
   type: 0
+  isFrozen: 0
   score: 0
   chessBoard: {fileID: 2008587366}
   slider: {fileID: 3316528}

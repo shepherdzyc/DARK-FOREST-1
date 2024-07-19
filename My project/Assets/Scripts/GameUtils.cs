@@ -137,7 +137,7 @@ public class GameUtils
         return false;
     }
 
-    // 解析带方括号的字符串
+    // 解析带方括号的字符串，将其转化为二维数组
     public static int[][] ParseIntArray2D(string input)
     {
         // 分割多个方括号
@@ -152,6 +152,23 @@ public class GameUtils
             result[i] = cleanedString.Split(',').Select(int.Parse).ToArray();
         }
 
+        return result;
+    }
+
+    // 解析带方括号的字符串，将其转化为一维数组
+    public static int[] ParseIntArray1D(string input)
+    {
+        // 检查输入是否为空或仅包含方括号
+        if (string.IsNullOrWhiteSpace(input) || input == "[]")
+        {
+            return new int[0]; // 返回一个空数组
+        }
+        // 移除首尾的方括号
+        string cleanedString = input.Trim('[', ']');
+        // 分割并解析为整数数组
+        int[] result = cleanedString.Split(',')
+                                    .Select(int.Parse)
+                                    .ToArray();
         return result;
     }
 }
