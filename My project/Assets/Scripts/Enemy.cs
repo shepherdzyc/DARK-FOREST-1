@@ -101,6 +101,7 @@ public class Enemy : MonoBehaviour
     {
         GameUtils.RemovePosPair(row, col);
         GameUtils.enemysArr.Remove(gameObject);
+        SpawnSurroundingEnemies();
         Destroy(gameObject);
         chessBoard.GetComponent<GameMainView>().AddScore();
         chessBoard.GetComponent<GameMainView>().UpdateHisScore();
@@ -115,7 +116,7 @@ public class Enemy : MonoBehaviour
         }
         int[,] directions = new int[,]
         {
-            {0,1},{0,-1},{-1,0}
+            {0,1},{0,-1},{-1,0},{0,0}
         };
         for (int i = 0; i < directions.GetLength(0); i++)
         {
@@ -124,7 +125,11 @@ public class Enemy : MonoBehaviour
             if (!GameUtils.findPos(newRow, newCol))
             {
                 // 生成敌人
-                // chessBoard.GetComponent<GameMainView>().CreateEnemy();
+                GameObject newEnemy = Instantiate(gameObject);
+                chessBoard.GetComponent<GameMainView>().UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { 1, 3 }, newCol, newRow, 0);
+                newEnemy.GetComponent<Enemy>().Initialize();
+                GameUtils.enemysArr.Add(newEnemy);
+                GameUtils.posArr.Add(new List<int> { newRow, newCol });
             }
         }
     }

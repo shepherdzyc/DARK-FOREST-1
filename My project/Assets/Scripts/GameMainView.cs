@@ -86,22 +86,22 @@ public class GameMainView : MonoBehaviour
     }
 
     // 异步读取CSV文件，返回数据集
-    private async Task<DataSet> ReadCSVFile(string filePath)
+    private DataSet ReadCSVFile(string filePath)
     {
         using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
         {
             using (var reader = ExcelReaderFactory.CreateCsvReader(stream))
             {
-                return await Task.Run(() => reader.AsDataSet());
+                return reader.AsDataSet();
             }
         }
     }
 
     // 回合开始时创建敌人
-    public async void CreateEnemy()
+    public void CreateEnemy()
     {
         string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
-        var result = await ReadCSVFile(filePath);
+        var result = ReadCSVFile(filePath);
         for (int index = 0; index < 2; index++)
         {
             level++;
@@ -126,10 +126,10 @@ public class GameMainView : MonoBehaviour
     }
 
     // 更新敌人属性，包括HP、位置和行数
-    private void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int pos, int row, int type)
+    public void UpdateEnemyProperties(Enemy enemy, int[] hpRange, int col, int row, int type)
     {
         enemy.row = row;
-        enemy.col = pos;
+        enemy.col = col;
         enemy.type = type;
         enemy.hp = UnityEngine.Random.Range(hpRange[0], hpRange[1]);
         enemy.transform.position = enemyPos.transform.Find("block_" + "5" + enemy.col).position;
@@ -310,21 +310,13 @@ public class GameMainView : MonoBehaviour
                 }
             }
         }
-        // 在PC,Editor或web上
-        if (Input.GetMouseButtonDown(0))
-        {
-            RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit.collider != null && hit.collider.gameObject.tag == "Attack")
-            {
-                selectedObject = hit.collider.gameObject;
-                PlayAttack();
-            }
-        }
     }
 
     // 玩家点击攻击
     private void PlayAttack()
     {
+        DelPosArr();
+        DestroyRoll();
         // 倒序遍历数组 防止因删除敌人出错
         for (int i = GameUtils.enemysArr.Count - 1; i >= 0; i--)
         {
@@ -332,8 +324,6 @@ public class GameMainView : MonoBehaviour
             GameUtils.enemysArr[i].GetComponent<Enemy>().TakeDamage();
         }
         Debug.Log("PlayAttack called");
-        DelPosArr();
-        DestroyRoll();
         GameUtils.delBlockNumArr();
         StartCoroutine(PlayAIRound());
     }
