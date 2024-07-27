@@ -28,8 +28,6 @@ public class GameMainView : MonoBehaviour
 
     private Camera mainCamera;
 
-    private GameObject selectedObject;
-
     private Transform chessBoardTransform;
 
     public GameObject[,] blocks;
@@ -38,8 +36,17 @@ public class GameMainView : MonoBehaviour
 
     public GameObject enemyPos;
 
+    private string isSpawn = null;
+
+    private int beginLevel = 0;
+
+    private int[] levelArr;
+
+    private bool isFrozen = false;
+
     void Awake()
     {
+        levelArr = new int[] { 1, 8, 14, 19, 27, 34, 45 };
         mainCamera = Camera.main;
         chessBoardTransform = chessBoard.transform;  // 缓存棋盘的Transform引用
     }
@@ -51,7 +58,7 @@ public class GameMainView : MonoBehaviour
 
     void Update()
     {
-        DetectAttack();
+
     }
 
     #region 回合内方法
@@ -102,17 +109,31 @@ public class GameMainView : MonoBehaviour
     {
         string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
         var result = ReadCSVFile(filePath);
-        for (int index = 0; index < 2; index++)
+        // 增加冰冻道具
+        if (isFrozen)
         {
-            level++;
-            int[] type = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][1].ToString());
-            if (type.Length == 0)
+            isFrozen = false;
+            return;
+        }
+        if (GameUtils.enemysArr.Count == 0)
+        {
+            for (int index = 0; index < 2; index++)
             {
-                break;
-            }
-            int[][] hp = GameUtils.ParseIntArray2D(result.Tables[0].Rows[level][2].ToString());
-            int[] pos = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][3].ToString());
-            {
+                level++;
+                isSpawn = result.Tables[0].Rows[level][4].ToString();
+                string flag = result.Tables[0].Rows[level][5].ToString();
+                if (flag != "" && index != 1)
+                {
+                    level = levelArr[++beginLevel];
+                }
+                int[] type = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][1].ToString());
+                if (type.Length == 0)
+                {
+                    break;
+                }
+                int[][] hp = GameUtils.ParseIntArray2D(result.Tables[0].Rows[level][2].ToString());
+                int[] pos = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][3].ToString());
+
                 for (int i = 0; i < type.Length; i++)
                 {
                     GameObject newEnemy = Instantiate(enemy);  //先用0，之后再用type中的类型
@@ -121,8 +142,42 @@ public class GameMainView : MonoBehaviour
                     GameUtils.enemysArr.Add(newEnemy);
                     GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
                 }
+
             }
         }
+        else
+        {
+            isSpawn = result.Tables[0].Rows[level][4].ToString();
+            if (isSpawn != "" || isCreate())
+            {
+                return;
+            }
+            level++;
+            int[] type = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][1].ToString());
+            int[][] hp = GameUtils.ParseIntArray2D(result.Tables[0].Rows[level][2].ToString());
+            int[] pos = GameUtils.ParseIntArray1D(result.Tables[0].Rows[level][3].ToString());
+
+            for (int i = 0; i < type.Length; i++)
+            {
+                GameObject newEnemy = Instantiate(enemy);  //先用0，之后再用type中的类型
+                UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { hp[i][0], hp[i][1] }, pos[i], 5, type[i]);
+                newEnemy.GetComponent<Enemy>().Initialize();
+                GameUtils.enemysArr.Add(newEnemy);
+                GameUtils.posArr.Add(new List<int> { newEnemy.GetComponent<Enemy>().row, newEnemy.GetComponent<Enemy>().col });
+            }
+        }
+    }
+
+    private bool isCreate()
+    {
+        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
+        {
+            if (GameUtils.enemysArr[i].GetComponent<Enemy>().row <= 2)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     // 更新敌人属性，包括HP、位置和行数
@@ -282,16 +337,6 @@ public class GameMainView : MonoBehaviour
         return color;
     }
 
-    // 对所有的敌人进行冰冻
-    private void Frozen()
-    {
-        // if()冰冻按钮被按下
-        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
-        {
-            GameUtils.enemysArr[i].GetComponent<Enemy>().isFrozen = true;
-        }
-    }
-
     // 检测是否按下攻击键  MARK:应该加一个判断骰子是否存在，如果不存在，无法按下攻击键
     public void DetectAttack()
     {
@@ -299,15 +344,10 @@ public class GameMainView : MonoBehaviour
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
+            if (touch.phase == TouchPhase.Ended)
             {
-                RaycastHit2D hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(touch.position), Vector2.zero);
-                if (hit.collider != null && hit.collider.gameObject.tag == "Attack")
-                {
-                    selectedObject = hit.collider.gameObject;
-                    Debug.Log(1);
-                    PlayAttack();
-                }
+                Debug.Log(1);
+                PlayAttack();
             }
         }
     }
@@ -315,7 +355,7 @@ public class GameMainView : MonoBehaviour
     // 玩家点击攻击
     private void PlayAttack()
     {
-        DelPosArr();
+        DelPosRollArr();
         DestroyRoll();
         // 倒序遍历数组 防止因删除敌人出错
         for (int i = GameUtils.enemysArr.Count - 1; i >= 0; i--)
@@ -354,7 +394,7 @@ public class GameMainView : MonoBehaviour
     }
 
     //回合结束时销毁pos数组中所有骰子的索引
-    public void DelPosArr()
+    public void DelPosRollArr()
     {
         for (int i = 0; i < GameUtils.rollsArr.Count; i++)
         {
@@ -365,22 +405,22 @@ public class GameMainView : MonoBehaviour
     }
 
     // 游戏结束后统一清除棋盘上所有骰子
-    public void ClearBlock(int row, int col)
-    {
-        Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
-        if (blockTransform == null)
-        {
-            Debug.LogError("未找到方块的 Transform: block_" + row + "_" + col);
-            return;
-        }
+    // public void ClearBlock(int row, int col)
+    // {
+    //     Transform blockTransform = chessBoardTransform.Find("block_" + row + "_" + col);
+    //     if (blockTransform == null)
+    //     {
+    //         Debug.LogError("未找到方块的 Transform: block_" + row + "_" + col);
+    //         return;
+    //     }
 
-        // 清除的颜色和数字可见性
-        blockTransform.GetChild(0).gameObject.SetActive(false);
-        blockTransform.GetChild(1).gameObject.SetActive(false);
+    //     // 清除的颜色和数字可见性
+    //     blockTransform.GetChild(0).gameObject.SetActive(false);
+    //     blockTransform.GetChild(1).gameObject.SetActive(false);
 
-        // 清楚blockNumArr数组的所有元素
-        GameUtils.blockNumArr[row, col] = 0;
-    }
+    //     // 清楚blockNumArr数组的所有元素
+    //     GameUtils.blockNumArr[row, col] = 0;
+    // }
 
     #region 回合逻辑
     // 开始第一个回合
@@ -416,6 +456,10 @@ public class GameMainView : MonoBehaviour
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
             GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
+            if (GameUtils.posArr[i][0] > 0)
+            {
+                GameUtils.posArr[i][0]--;
+            }
         }
         CreateEnemy();  //先创建敌人数组，防止随后创建的骰子位置和敌人重复
         yield return new WaitForSeconds(1f);
@@ -448,4 +492,48 @@ public class GameMainView : MonoBehaviour
     }
 
     #endregion
+
+    #region 道具相关
+    // 对所有的敌人进行冰冻
+    public void Frozen()
+    {
+        // if()冰冻按钮被按下
+        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
+        {
+            GameUtils.enemysArr[i].GetComponent<Enemy>().isFrozen = true;
+        }
+        isFrozen = true;
+    }
+
+    public void AddOneRoll()
+    {
+        int[] randomNumArr = GameUtils.CreateRandomNum();
+        int[][] randomPosArr = GameUtils.CreateRandomPos();
+        int x = randomPosArr[0][0];
+        int y = randomPosArr[0][1];
+        GameUtils.RollType type = GameUtils.CreateRandomType();
+        string blockName = "block_" + x.ToString() + y.ToString();
+        Transform blockTransform = chessBoardTransform.Find(blockName);
+        if (blockTransform == null)
+        {
+            Debug.LogError("Block transform not found: " + blockName);
+            return;
+        }
+        else
+        {
+            GameObject newRoll = Instantiate(rolls[randomNumArr[0] - 1]);
+            newRoll.GetComponent<RollController>().row = x;
+            newRoll.GetComponent<RollController>().col = y;
+            newRoll.GetComponent<RollController>().num = randomNumArr[0];
+            newRoll.GetComponent<RollController>().type = type;
+            GameUtils.rollsArr.Add(newRoll);
+            // newRoll.transform.position = blockTransform.position;
+            int row = newRoll.GetComponent<RollController>().row;
+            int col = newRoll.GetComponent<RollController>().col;
+            int num = newRoll.GetComponent<RollController>().num;
+            UpdateBlockBasedOnType(type, row, col, num, true, true);
+        }
+
+        #endregion
+    }
 }

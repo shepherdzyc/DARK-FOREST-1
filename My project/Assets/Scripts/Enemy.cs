@@ -67,7 +67,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // 敌人生成时的处理
+    // 特殊敌人生成时的处理
     public void Spawn()
     {
 
@@ -97,7 +97,7 @@ public class Enemy : MonoBehaviour
     }
 
     // 敌人死亡时的处理，增加游戏得分、销毁游戏对象、播放死亡动画等
-    public virtual void Die()
+    public void Die()
     {
         GameUtils.RemovePosPair(row, col);
         GameUtils.enemysArr.Remove(gameObject);
@@ -116,24 +116,29 @@ public class Enemy : MonoBehaviour
         }
         int[,] directions = new int[,]
         {
-            {0,1},{0,-1},{-1,0},{0,0}
+            {0,1},{0,-1},{1,0},{0,0}
         };
         for (int i = 0; i < directions.GetLength(0); i++)
         {
             int newRow = row + directions[i, 0];
             int newCol = col + directions[i, 1];
+            // 确保新生成的敌人位置没有敌人存在
             if (!GameUtils.findPos(newRow, newCol))
             {
                 // 生成敌人
                 GameObject newEnemy = Instantiate(gameObject);
                 chessBoard.GetComponent<GameMainView>().UpdateEnemyProperties(newEnemy.GetComponent<Enemy>(), new int[] { 1, 3 }, newCol, newRow, 0);
                 newEnemy.GetComponent<Enemy>().Initialize();
+                Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
+                newEnemy.transform.position = blockTransform.position;
                 GameUtils.enemysArr.Add(newEnemy);
-                GameUtils.posArr.Add(new List<int> { newRow, newCol });
+                GameUtils.AddPosPair(newRow, newCol);
+                newEnemy.GetComponent<Enemy>().Move(true);                // 更新GameUtils中的位置和敌人数组
             }
         }
     }
 
+    // 敌人回合开始时向前移动
     // 敌人回合开始时向前移动
     public void Move(bool isFirstCreated)
     {
@@ -143,15 +148,14 @@ public class Enemy : MonoBehaviour
             isFrozen = false;
             return;
         }
+
         if (!isFirstCreated)
         {
-            GameUtils.RemovePosPair(row, col);
             if (row > 0)
             {
                 row--;
                 StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
             }
-            GameUtils.AddPosPair(row, col);
         }
         else
         {

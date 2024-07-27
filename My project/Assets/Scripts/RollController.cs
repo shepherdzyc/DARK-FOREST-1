@@ -61,8 +61,19 @@ public class RollController : MonoBehaviour
                     {
                         Vector3 worldPos = Camera.main.ScreenToWorldPoint(touch.position);
                         worldPos.z = selectedObject.transform.position.z;
-                        Vector3 blockPos = getBoardPos(selectedObject.transform.position, worldPos);
-                        selectedObject.transform.position = blockPos;
+                        if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40 && !isStorage)
+                        {
+                            storageRoll();
+                            selectedObject.transform.position = storageBoard.transform.position;
+                        }
+                        else if (selectedObject.transform.position == storageBoard.transform.position && isStorage)
+                        {
+                            UseStorageRoll(worldPos);
+                        }
+                        else
+                        {
+                            selectedObject.transform.position = getBoardPos(selectedObject.transform.position, worldPos);
+                        }
                     }
                     break;
 
@@ -77,64 +88,64 @@ public class RollController : MonoBehaviour
         }
 
         // 如果是在PC,Editor或web上,使用鼠标事件处理
-        if (Input.GetMouseButtonDown(0))
-        {
-            HandleTouchEvents(Input.mousePosition, TouchPhase.Began);
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            HandleTouchEvents(Input.mousePosition, TouchPhase.Ended);
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            HandleTouchEvents(Input.mousePosition, TouchPhase.Moved);
-        }
+        // if (Input.GetMouseButtonDown(0))
+        // {
+        //     HandleTouchEvents(Input.mousePosition, TouchPhase.Began);
+        // }
+        // else if (Input.GetMouseButtonUp(0))
+        // {
+        //     HandleTouchEvents(Input.mousePosition, TouchPhase.Ended);
+        // }
+        // else if (Input.GetMouseButton(0))
+        // {
+        //     HandleTouchEvents(Input.mousePosition, TouchPhase.Moved);
+        // }
     }
 
-    private void HandleTouchEvents(Vector3 position, TouchPhase phase)
-    {
-        switch (phase)
-        {
-            case TouchPhase.Began:
-                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(position), Vector2.zero);
-                if (hit.collider != null)
-                {
-                    selectedObject = hit.collider.gameObject;
-                }
-                break;
+    // private void HandleTouchEvents(Vector3 position, TouchPhase phase)
+    // {
+    //     switch (phase)
+    //     {
+    //         case TouchPhase.Began:
+    //             RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(position), Vector2.zero);
+    //             if (hit.collider != null)
+    //             {
+    //                 selectedObject = hit.collider.gameObject;
+    //             }
+    //             break;
 
-            case TouchPhase.Moved:
-                if (selectedObject != null)
-                {
-                    Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
-                    worldPos.z = selectedObject.transform.position.z;
-                    if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40 && !isStorage)
-                    {
-                        storageRoll();
-                        selectedObject.transform.position = storageBoard.transform.position;
-                    }
-                    else if (selectedObject.transform.position == storageBoard.transform.position && isStorage)
-                    {
-                        UseStorageRoll(worldPos);
-                    }
-                    else
-                    {
-                        selectedObject.transform.position = getBoardPos(selectedObject.transform.position, worldPos);
-                    }
-                }
-                break;
+    //         case TouchPhase.Moved:
+    //             if (selectedObject != null)
+    //             {
+    //                 Vector3 worldPos = Camera.main.ScreenToWorldPoint(position);
+    //                 worldPos.z = selectedObject.transform.position.z;
+    //                 if (Vector2.Distance(worldPos, storageBoard.transform.position) <= 40 && !isStorage)
+    //                 {
+    //                     storageRoll();
+    //                     selectedObject.transform.position = storageBoard.transform.position;
+    //                 }
+    //                 else if (selectedObject.transform.position == storageBoard.transform.position && isStorage)
+    //                 {
+    //                     UseStorageRoll(worldPos);
+    //                 }
+    //                 else
+    //                 {
+    //                     selectedObject.transform.position = getBoardPos(selectedObject.transform.position, worldPos);
+    //                 }
+    //             }
+    //             break;
 
-            case TouchPhase.Ended:
-                if (selectedObject != null)
-                {
-                    // 移动结束时更新游戏主视图的方块状态
-                    selectedObject = null;
-                }
-                break;
-        }
-    }
+    //         case TouchPhase.Ended:
+    //             if (selectedObject != null)
+    //             {
+    //                 // 移动结束时更新游戏主视图的方块状态
+    //                 selectedObject = null;
+    //             }
+    //             break;
+    //     }
+    // }
 
-    //骰子移动时的判断
+    // //骰子移动时的判断
     private Vector2 getBoardPos(Vector3 beginPos, Vector3 worldPos)
     {
         for (int x = 0; x < 6; x++)
