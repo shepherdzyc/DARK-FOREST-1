@@ -30,35 +30,19 @@ public class MenuView : MonoBehaviour
 
     }
 
-    string usernameString
-    {
-        get
-        {
-            return userName.GetComponent<TextMeshPro>().text;
-        }
-    }
-
-    string passwordString
-    {
-        get
-        {
-            return password.GetComponent<TextMeshPro>().text;
-        }
-    }
-
     public void RegisterButton()
     {
-        if (!string.IsNullOrWhiteSpace(usernameString) && !string.IsNullOrWhiteSpace(passwordString))
+        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
         {
-            AccountManager.Instance.SendCreateAccount(usernameString, passwordString, usernameString);
+
         }
     }
 
     public void LoginButton()
     {
-        if (!string.IsNullOrEmpty(userName.GetComponent<TextMeshPro>().text.ToString()) && !string.IsNullOrEmpty(password.GetComponent<TextMeshPro>().text.ToString()))
+        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
         {
-            AccountManager.Instance.SendLogin(usernameString, passwordString);
+
         }
     }
 
