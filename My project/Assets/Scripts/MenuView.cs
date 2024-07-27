@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -30,25 +31,54 @@ public class MenuView : MonoBehaviour
 
     }
 
+    string usernameString
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(userName.text))
+            {
+                return "";
+            }
+            return userName.text;
+        }
+    }
+
+    string passwordString
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(password.text))
+            {
+                return "";
+            }
+            return password.text;
+        }
+    }
+
     public void RegisterButton()
     {
-        if (userName.text != "" && password.text != "")
+        if (usernameString.Length > 2 && passwordString.Length > 2)
         {
-
+            Task tsk =  AccountManager.Instance.SendCreateAccount(usernameString, passwordString, usernameString);
+            tsk.ContinueWith(t =>
+            {
+            });
+            
         }
     }
 
     public void LoginButton()
     {
-        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
+        if (usernameString.Length > 2 && passwordString.Length > 2)
         {
-
+            Task tsk = AccountManager.Instance.SendLogin(usernameString, passwordString);
+            tsk.ContinueWith(t => { });
         }
     }
 
     // 更新排行榜方法
 
-    public void ShowPopup(string title, string message)
+    public static void ShowPopup(string title, string message)
     {
         //to be completed
         return;
