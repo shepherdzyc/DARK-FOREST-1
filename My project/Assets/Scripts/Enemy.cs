@@ -25,9 +25,9 @@ public class Enemy : MonoBehaviour
 
     public bool isFire = false;
 
-    public int fireSum = 0;
+    private int fireNum = 0;
 
-    public int fireDamage;
+    public int fireDamage = 0;
 
     public int score; // 消灭敌人增加的分数
 
@@ -71,6 +71,10 @@ public class Enemy : MonoBehaviour
     // 敌人的攻击逻辑
     public void Attack()
     {
+        if (type == 5)
+        {
+            slider.value -= damage;
+        }
         if (row == 0)
         {
             slider.value -= damage;
@@ -86,6 +90,16 @@ public class Enemy : MonoBehaviour
     // 受到玩家攻击
     public void TakeDamage()
     {
+        if (fireNum == 1)
+        {
+            fireNum = 0;
+            hp -= fireDamage;
+        }
+        if (isFire)
+        {
+            fireNum++;
+            isFire = false;
+        }
         Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
         if (blockTransform != null)
         {
@@ -96,15 +110,6 @@ public class Enemy : MonoBehaviour
                 return;
             }
             UpdateHP();
-        }
-    }
-
-    public void Fire()
-    {
-        fireSum++;
-        if (fireSum == 2)
-        {
-
         }
     }
 

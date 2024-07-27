@@ -13,7 +13,8 @@ public class GameUtils
         rowType,
         colType,
         aroundType,
-        frozenType
+        frozenType,
+        fireType,
     }
 
     // 存放敌人的位置，随时更新
