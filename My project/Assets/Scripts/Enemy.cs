@@ -33,6 +33,8 @@ public class Enemy : MonoBehaviour
 
     private Sprite sprite;
 
+    private int hpScore;
+
     private void Awake()
     {
 
@@ -50,6 +52,7 @@ public class Enemy : MonoBehaviour
         {
             sprite = Resources.Load<Sprite>("Arts/Enemy_" + type.ToString());
             GetComponent<SpriteRenderer>().sprite = sprite;
+            hpScore = hp;
         }
         else
         {
@@ -99,11 +102,11 @@ public class Enemy : MonoBehaviour
     // 敌人死亡时的处理，增加游戏得分、销毁游戏对象、播放死亡动画等
     public void Die()
     {
+        chessBoard.GetComponent<GameMainView>().AddScore(hpScore);
         GameUtils.RemovePosPair(row, col);
         GameUtils.enemysArr.Remove(gameObject);
         SpawnSurroundingEnemies();
         Destroy(gameObject);
-        chessBoard.GetComponent<GameMainView>().AddScore();
         chessBoard.GetComponent<GameMainView>().UpdateHisScore();
     }
 

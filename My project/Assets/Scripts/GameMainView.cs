@@ -455,6 +455,10 @@ public class GameMainView : MonoBehaviour
     {
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
+            if (isFrozen)
+            {
+                break;
+            }
             GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
             if (GameUtils.posArr[i][0] > 0)
             {
@@ -473,10 +477,10 @@ public class GameMainView : MonoBehaviour
 
     #region 分数和排行相关
     // 消灭敌人后增加分数
-    public void AddScore()
+    public void AddScore(int hpScore)
     {
         int score = int.Parse(curScoreObj.GetComponent<TextMeshPro>().text);
-        score += 15;
+        score += hpScore;
         curScoreObj.GetComponent<TextMeshPro>().text = score.ToString();
     }
 

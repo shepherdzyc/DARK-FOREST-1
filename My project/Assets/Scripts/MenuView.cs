@@ -20,6 +20,21 @@ public class MenuView : MonoBehaviour
         Application.Quit();
     }
 
+    public void RankButton()
+    {
+
+    }
+
+    public void RegisterButton()
+    {
+
+    }
+
+    public void LoginButton()
+    {
+
+    }
+
     // 更新排行榜方法
     public void UpdateLeaderboard(string[] playerNames, int[] scores)
     {
