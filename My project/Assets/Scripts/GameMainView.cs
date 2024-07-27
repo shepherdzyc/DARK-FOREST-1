@@ -367,11 +367,7 @@ public class GameMainView : MonoBehaviour
             RollController rollController = GameUtils.rollsArr[i].GetComponent<RollController>();
             if (rollController.isFrozen)
             {
-                int[,] directions = new int[,]
-                {
-            {0,0},{0,-1},{-1,0},{-1,-1},{1,0},{0,1},{1,1},{1,-1},{-1,1}
-                };
-
+                int[,] directions = new int[,] { { 0, 0 }, { 0, -1 }, { -1, 0 }, { -1, -1 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 }, { -1, 1 } };
                 for (int j = 0; j < directions.GetLength(0); j++)
                 {
                     int newRow = rollController.row + directions[j, 0];
@@ -387,8 +383,26 @@ public class GameMainView : MonoBehaviour
                     }
                 }
             }
-        }
+            else if (rollController.isFire)
+            {
+                int[,] directions = new int[,] { { 0, 0 }, { 0, -1 }, { -1, 0 }, { -1, -1 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 }, { -1, 1 } };
+                for (int j = 0; j < directions.GetLength(0); j++)
+                {
+                    int newRow = rollController.row + directions[j, 0];
+                    int newCol = rollController.col + directions[j, 1];
 
+                    for (int z = 0; z < GameUtils.enemysArr.Count; z++)
+                    {
+                        Enemy enemy = GameUtils.enemysArr[z].GetComponent<Enemy>();
+                        if (newRow == enemy.row && newCol == enemy.col)
+                        {
+                            enemy.isFire = true;
+                            enemy.GetComponent<Enemy>().fireDamage = rollController.num;
+                        }
+                    }
+                }
+            }
+        }
 
         DelPosRollArr();
         DestroyRoll();

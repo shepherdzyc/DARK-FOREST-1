@@ -300,25 +300,5 @@ public class RollController : MonoBehaviour
         }
         return null;
     }
-
-
-    #endregion
-
-    #region 特殊骰子逻辑
-    private void AddRoll()
-    {
-
-    }
-
-    private void FrozenRoll()
-    {
-
-    }
-
-    private void FireRoll()
-    {
-
-    }
-
     #endregion
 }
