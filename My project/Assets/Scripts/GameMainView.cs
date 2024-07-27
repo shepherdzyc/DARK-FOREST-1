@@ -42,8 +42,6 @@ public class GameMainView : MonoBehaviour
 
     private int[] levelArr;
 
-    private bool isFrozen = false;
-
     void Awake()
     {
         levelArr = new int[] { 1, 8, 14, 19, 27, 34, 45 };
@@ -109,12 +107,6 @@ public class GameMainView : MonoBehaviour
     {
         string filePath = Application.dataPath + "/Config/EnemySpawn.csv";
         var result = ReadCSVFile(filePath);
-        // 增加冰冻道具
-        if (isFrozen)
-        {
-            isFrozen = false;
-            return;
-        }
         if (GameUtils.enemysArr.Count == 0)
         {
             for (int index = 0; index < 2; index++)
@@ -274,7 +266,7 @@ public class GameMainView : MonoBehaviour
                 UpdateBlock(row, j, num, updateColor, updateNumber);
             }
         }
-        else
+        else if (type == GameUtils.RollType.aroundType)
         {
             UpdateBlock(row, col, num, updateColor, updateNumber);
             if (row - 1 >= 0)
@@ -292,6 +284,19 @@ public class GameMainView : MonoBehaviour
             if (col + 1 <= 4)
             {
                 UpdateBlock(row, col + 1, num, updateColor, updateNumber);
+            }
+        }
+        else
+        {
+            int[,] directions = new int[,] { { 0, 0 }, { 0, -1 }, { -1, 0 }, { -1, -1 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 }, { -1, 1 } };
+            for (int j = 0; j < directions.GetLength(0); j++)
+            {
+                int newRow = row + directions[j, 0];
+                int newCol = col + directions[j, 1];
+                if (newRow >= 0 && newRow <= 5 && newCol >= 0 && newCol <= 4)
+                {
+                    UpdateBlock(newRow, newCol, num, updateColor, updateNumber);
+                }
             }
         }
     }
@@ -355,12 +360,42 @@ public class GameMainView : MonoBehaviour
     // 玩家点击攻击
     private void PlayAttack()
     {
+        //特殊骰子判断逻辑
+        // 获取 RollController 和 Enemy 组件
+        for (int i = 0; i < GameUtils.rollsArr.Count; i++)
+        {
+            RollController rollController = GameUtils.rollsArr[i].GetComponent<RollController>();
+            if (rollController.isFrozen)
+            {
+                int[,] directions = new int[,]
+                {
+            {0,0},{0,-1},{-1,0},{-1,-1},{1,0},{0,1},{1,1},{1,-1},{-1,1}
+                };
+
+                for (int j = 0; j < directions.GetLength(0); j++)
+                {
+                    int newRow = rollController.row + directions[j, 0];
+                    int newCol = rollController.col + directions[j, 1];
+
+                    for (int z = 0; z < GameUtils.enemysArr.Count; z++)
+                    {
+                        Enemy enemy = GameUtils.enemysArr[z].GetComponent<Enemy>();
+                        if (newRow == enemy.row && newCol == enemy.col)
+                        {
+                            enemy.isFrozen = true;
+                        }
+                    }
+                }
+            }
+        }
+
+
         DelPosRollArr();
         DestroyRoll();
+
         // 倒序遍历数组 防止因删除敌人出错
         for (int i = GameUtils.enemysArr.Count - 1; i >= 0; i--)
         {
-            Debug.Log(100);
             GameUtils.enemysArr[i].GetComponent<Enemy>().TakeDamage();
         }
         Debug.Log("PlayAttack called");
@@ -453,12 +488,11 @@ public class GameMainView : MonoBehaviour
     // 进行下一个回合
     private IEnumerator NextRound()
     {
+        GameUtils.UpRound++;
+        GameUtils.FrozenRound++;
+        GameUtils.FireRound++;
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
-            if (isFrozen)
-            {
-                break;
-            }
             GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
             if (GameUtils.posArr[i][0] > 0)
             {
@@ -496,48 +530,4 @@ public class GameMainView : MonoBehaviour
     }
 
     #endregion
-
-    #region 道具相关
-    // 对所有的敌人进行冰冻
-    public void Frozen()
-    {
-        // if()冰冻按钮被按下
-        for (int i = 0; i < GameUtils.enemysArr.Count; i++)
-        {
-            GameUtils.enemysArr[i].GetComponent<Enemy>().isFrozen = true;
-        }
-        isFrozen = true;
-    }
-
-    public void AddOneRoll()
-    {
-        int[] randomNumArr = GameUtils.CreateRandomNum();
-        int[][] randomPosArr = GameUtils.CreateRandomPos();
-        int x = randomPosArr[0][0];
-        int y = randomPosArr[0][1];
-        GameUtils.RollType type = GameUtils.CreateRandomType();
-        string blockName = "block_" + x.ToString() + y.ToString();
-        Transform blockTransform = chessBoardTransform.Find(blockName);
-        if (blockTransform == null)
-        {
-            Debug.LogError("Block transform not found: " + blockName);
-            return;
-        }
-        else
-        {
-            GameObject newRoll = Instantiate(rolls[randomNumArr[0] - 1]);
-            newRoll.GetComponent<RollController>().row = x;
-            newRoll.GetComponent<RollController>().col = y;
-            newRoll.GetComponent<RollController>().num = randomNumArr[0];
-            newRoll.GetComponent<RollController>().type = type;
-            GameUtils.rollsArr.Add(newRoll);
-            // newRoll.transform.position = blockTransform.position;
-            int row = newRoll.GetComponent<RollController>().row;
-            int col = newRoll.GetComponent<RollController>().col;
-            int num = newRoll.GetComponent<RollController>().num;
-            UpdateBlockBasedOnType(type, row, col, num, true, true);
-        }
-
-        #endregion
-    }
 }

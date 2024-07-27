@@ -23,6 +23,12 @@ public class Enemy : MonoBehaviour
 
     public bool isFrozen = false; //增加敌人被冰冻状态
 
+    public bool isFire = false;
+
+    public int fireSum = 0;
+
+    public int fireDamage;
+
     public int score; // 消灭敌人增加的分数
 
     public GameObject chessBoard;
@@ -34,6 +40,7 @@ public class Enemy : MonoBehaviour
     private Sprite sprite;
 
     private int hpScore;
+
 
     private void Awake()
     {
@@ -76,7 +83,6 @@ public class Enemy : MonoBehaviour
 
     }
 
-
     // 受到玩家攻击
     public void TakeDamage()
     {
@@ -90,6 +96,15 @@ public class Enemy : MonoBehaviour
                 return;
             }
             UpdateHP();
+        }
+    }
+
+    public void Fire()
+    {
+        fireSum++;
+        if (fireSum == 2)
+        {
+
         }
     }
 
@@ -142,7 +157,6 @@ public class Enemy : MonoBehaviour
     }
 
     // 敌人回合开始时向前移动
-    // 敌人回合开始时向前移动
     public void Move(bool isFirstCreated)
     {
         // 如果被道具冰冻，则敌人无法移动
@@ -152,13 +166,17 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        if (!isFirstCreated)
+        if (!isFirstCreated && row > 0)
         {
-            if (row > 0)
+            if (type != 4)
             {
                 row--;
-                StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
             }
+            else
+            {
+                row = Mathf.Max(row - 2, 0);
+            }
+            StartCoroutine(MoveAnim(chessBoard.transform.Find("block_" + row.ToString() + col.ToString()).position));
         }
         else
         {

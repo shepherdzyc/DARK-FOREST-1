@@ -17,12 +17,19 @@ public class RollController : MonoBehaviour
     public int col;
     public int num;
 
+    public bool isFrozen = false; //增加敌人被冰冻状态
+
+    public bool isFire = false;
+
     public GameUtils.RollType type;
 
     [SerializeField]
     private float speed = 500f;  // 初始速度
 
     private bool isMoving = false;  // 用于跟踪骰子是否正在移动
+
+    private GameObject previousStorageBoard; // 记录上一个存储槽：
+
 
     void Start()
     {
@@ -51,6 +58,7 @@ public class RollController : MonoBehaviour
                     if (hit.collider != null)
                     {
                         selectedObject = hit.collider.gameObject;
+                        previousStorageBoard = GetStorageSlot(selectedObject.transform.position);  // 记录最初的存储槽
                     }
                     break;
 
@@ -63,8 +71,13 @@ public class RollController : MonoBehaviour
                         {
                             if (Vector2.Distance(worldPos, storageBoard[i].transform.position) <= 40 && !storageBoard[i].GetComponent<StorageBoardController>().isOccupied)
                             {
+                                if (previousStorageBoard != null && previousStorageBoard != storageBoard[i])
+                                {
+                                    previousStorageBoard.GetComponent<StorageBoardController>().isOccupied = false;
+                                }
                                 storageRoll(storageBoard[i]);
                                 selectedObject.transform.position = storageBoard[i].transform.position;
+                                previousStorageBoard = storageBoard[i];  // 更新上一个存储槽
                             }
                             else if (selectedObject.transform.position == storageBoard[i].transform.position && storageBoard[i].GetComponent<StorageBoardController>().isOccupied)
                             {
@@ -78,13 +91,31 @@ public class RollController : MonoBehaviour
                     }
                     break;
 
+
                 case TouchPhase.Ended:
                     if (selectedObject != null)
                     {
-                        // 移动结束时更新游戏主视图的方块状态
+                        // 检查是否在存储槽中结束拖动
+                        bool inStorageSlot = false;
+                        foreach (var slot in storageBoard)
+                        {
+                            if (selectedObject.transform.position == slot.transform.position)
+                            {
+                                inStorageSlot = true;
+                                break;
+                            }
+                        }
+                        if (!inStorageSlot)
+                        {
+                            // 在棋盘上处理
+                            Vector3 worldPos = Camera.main.ScreenToWorldPoint(touch.position);
+                            worldPos.z = selectedObject.transform.position.z;
+                            selectedObject.transform.position = getBoardPos(selectedObject.transform.position, worldPos);
+                        }
                         selectedObject = null;
                     }
                     break;
+
             }
         }
     }
@@ -207,7 +238,7 @@ public class RollController : MonoBehaviour
     #region 存储槽逻辑
 
     //存储棋盘上骰子
-    private void storageRoll(GameObject storageBoard)
+    public void storageRoll(GameObject storageBoard)
     {
         int x = selectedObject.GetComponent<RollController>().row;
         int y = selectedObject.GetComponent<RollController>().col;
@@ -219,6 +250,7 @@ public class RollController : MonoBehaviour
         chessBoard.GetComponent<GameMainView>().SetBlockColor();
         chessBoard.GetComponent<GameMainView>().UpdateBlockNum();
         storageBoard.GetComponent<StorageBoardController>().isOccupied = true;
+        storageBoard.GetComponent<StorageBoardController>().roll = selectedObject;
     }
 
     //使用已经存储起来的骰子
@@ -230,7 +262,7 @@ public class RollController : MonoBehaviour
             {
                 string blockName = "block_" + x.ToString() + y.ToString();
                 Transform blockTransform = chessBoard.transform.Find(blockName);
-                if (blockTransform != null && Vector2.Distance(worldPos, blockTransform.position) <= 40)
+                if (blockTransform != null && Vector2.Distance(worldPos, blockTransform.position) <= 55)
                 {
                     bool alreadyChosen = GameUtils.findPos(x, y);
                     if (alreadyChosen)
@@ -256,6 +288,19 @@ public class RollController : MonoBehaviour
             }
         }
     }
+
+    private GameObject GetStorageSlot(Vector3 position)
+    {
+        foreach (var slot in storageBoard)
+        {
+            if (slot.transform.position == position)
+            {
+                return slot;
+            }
+        }
+        return null;
+    }
+
 
     #endregion
 

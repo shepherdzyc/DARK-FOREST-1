@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.0504529, y: 0.68758464}
   m_AnchorMax: {x: 0.1795471, y: 0.70719486}
-  m_AnchoredPosition: {x: -1.3999023, y: 0.19998169}
+  m_AnchoredPosition: {x: -1.4000244, y: 0.19998169}
   m_SizeDelta: {x: -4.25, y: 8.037003}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3316528
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 58064203}
   m_Layer: 0
   m_Name: AddStorageBoard
-  m_TagString: Untagged
+  m_TagString: Add
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -462,7 +462,7 @@ Transform:
   m_GameObject: {fileID: 58064199}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -154.6, y: 158.1, z: 0}
+  m_LocalPosition: {x: -135.1, y: 127.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -526,6 +526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOccupied: 0
+  roll: {fileID: 0}
 --- !u!1 &110804384
 GameObject:
   m_ObjectHideFlags: 0
@@ -2198,6 +2199,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &407432730
@@ -3574,10 +3577,10 @@ RectTransform:
   - {fileID: 1161471455}
   m_Father: {fileID: 776904581}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -101, y: 496}
-  m_SizeDelta: {x: -1763.084, y: -1154.2712}
+  m_AnchorMin: {x: 0.33445293, y: 0.8331949}
+  m_AnchorMax: {x: 0.5375472, y: 0.9283897}
+  m_AnchoredPosition: {x: -3, y: 3}
+  m_SizeDelta: {x: 0.9160156, y: -250.27124}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &655827607
 MonoBehaviour:
@@ -3723,6 +3726,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &664148281
@@ -4432,6 +4437,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &765551712
@@ -5623,7 +5630,7 @@ GameObject:
   - component: {fileID: 952727596}
   m_Layer: 0
   m_Name: FireStorageBoard
-  m_TagString: Untagged
+  m_TagString: Fire
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5734,7 +5741,7 @@ Transform:
   m_GameObject: {fileID: 952727592}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -154.6, y: -28.8, z: 0}
+  m_LocalPosition: {x: -133.7, y: -119.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5753,6 +5760,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOccupied: 0
+  roll: {fileID: 0}
 --- !u!1 &968101068
 GameObject:
   m_ObjectHideFlags: 0
@@ -6138,6 +6146,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &1047380736
@@ -8057,6 +8067,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &1327775967
@@ -8390,7 +8402,7 @@ GameObject:
   - component: {fileID: 1401269102}
   m_Layer: 0
   m_Name: FrozenStorageBoard
-  m_TagString: Untagged
+  m_TagString: Frozen
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8501,7 +8513,7 @@ Transform:
   m_GameObject: {fileID: 1401269098}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -154.6, y: 66.7, z: 0}
+  m_LocalPosition: {x: -135.7, y: 4.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8520,6 +8532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOccupied: 0
+  roll: {fileID: 0}
 --- !u!1 &1403156348
 GameObject:
   m_ObjectHideFlags: 0
@@ -8626,6 +8639,8 @@ MonoBehaviour:
   row: 0
   col: 0
   num: 0
+  isFrozen: 0
+  isFire: 0
   type: 0
   speed: 500
 --- !u!61 &1403156353
@@ -10294,6 +10309,8 @@ MonoBehaviour:
   col: 0
   type: 0
   isFrozen: 0
+  isFire: 0
+  fireDamage: 0
   score: 0
   chessBoard: {fileID: 2008587366}
   slider: {fileID: 3316528}

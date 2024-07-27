@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Attack
+  - Add
+  - Frozen
+  - Fire
   layers:
   - Default
   - TransparentFX

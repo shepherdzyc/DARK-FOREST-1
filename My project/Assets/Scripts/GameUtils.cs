@@ -13,6 +13,7 @@ public class GameUtils
         rowType,
         colType,
         aroundType,
+        frozenType
     }
 
     // 存放敌人的位置，随时更新
@@ -29,6 +30,12 @@ public class GameUtils
 
     // 存放棋盘中已存在的位置
     public static List<List<int>> posArr = new List<List<int>>();
+
+    public static int UpRound = 0;
+
+    public static int FrozenRound = 0;
+
+    public static int FireRound = 0;
 
     // 随机创建1~6出三个随机数的数组
     public static int[] CreateRandomNum()
@@ -69,12 +76,20 @@ public class GameUtils
         return randomPos;
     }
 
-    // 随机生成骰子类型
+    // 随机生成骰子类型，但不包含frozenType
     public static RollType CreateRandomType()
     {
+        // 获取所有RollType枚举值
         RollType[] allTypes = (RollType[])Enum.GetValues(typeof(RollType));
-        int randomIndex = UnityEngine.Random.Range(0, allTypes.Length);
-        RollType randomType = allTypes[randomIndex];
+
+        // 过滤掉frozenType
+        List<RollType> filteredTypes = new List<RollType>(allTypes);
+        filteredTypes.Remove(RollType.frozenType);
+
+        // 随机选择一个类型
+        int randomIndex = UnityEngine.Random.Range(0, filteredTypes.Count);
+        RollType randomType = filteredTypes[randomIndex];
+
         return randomType;
     }
 

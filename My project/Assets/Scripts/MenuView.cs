@@ -11,9 +11,9 @@ public class MenuView : MonoBehaviour
 
     public Transform content;
 
-    public TMP_InputField userName;
+    public TextMeshProUGUI userName;
 
-    public TMP_InputField password;
+    public TextMeshProUGUI password;
 
     public void PlayGame()
     {
@@ -32,7 +32,7 @@ public class MenuView : MonoBehaviour
 
     public void RegisterButton()
     {
-        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
+        if (userName.text != "" && password.text != "")
         {
 
         }
