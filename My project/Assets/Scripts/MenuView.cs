@@ -47,6 +47,12 @@ public class MenuView : MonoBehaviour
     }
 
     // 更新排行榜方法
+
+    public void ShowPopup(string title, string message)
+    {
+        //to be completed
+        return;
+    }
     public void UpdateLeaderboard(string[] playerNames, int[] scores)
     {
         // 清空现有的排行榜
