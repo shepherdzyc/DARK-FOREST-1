@@ -196,15 +196,15 @@ public class AccountManager
 
     private static async Task<bool> CreateAccountAsync(object data)
     {
-        Debug.Log("1");
+
         var json = JsonConvert.SerializeObject(data);
-        Debug.Log("2");
+
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        Debug.Log("3");
+
         var response = await client.PostAsync("Scores/createAccount", content);
-        Debug.Log("4");
+
         response.EnsureSuccessStatusCode();
-        Debug.Log("6");
+
         if (!response.IsSuccessStatusCode)
         {
             Debug.Log("Failure");
