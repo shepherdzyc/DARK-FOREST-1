@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,6 +10,10 @@ public class MenuView : MonoBehaviour
     public GameObject itemCell;
 
     public Transform content;
+
+    public TMP_InputField userName;
+
+    public TMP_InputField password;
 
     public void PlayGame()
     {
@@ -27,12 +32,18 @@ public class MenuView : MonoBehaviour
 
     public void RegisterButton()
     {
+        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
+        {
 
+        }
     }
 
     public void LoginButton()
     {
+        if (userName.GetComponent<TextMeshPro>().text.ToString() != "" && password.GetComponent<TextMeshPro>().text.ToString() != "")
+        {
 
+        }
     }
 
     // 更新排行榜方法

@@ -4441,6 +4441,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemCell: {fileID: 0}
   content: {fileID: 0}
+  userName: {fileID: 1781113964}
+  password: {fileID: 2051576598}
 --- !u!1 &1983851820
 GameObject:
   m_ObjectHideFlags: 0
