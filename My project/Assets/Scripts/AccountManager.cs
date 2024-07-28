@@ -58,7 +58,7 @@ public class AccountManager
         }
     }
 
-    // Ë½ÓĞ¹¹Ôìº¯Êı£¬±ÜÃâ´ÓÍâ²¿ÊµÀı»¯´ËÀà
+    // ç§æœ‰æ„é€ å‡½æ•°ï¼Œé¿å…ä»å¤–éƒ¨å®ä¾‹åŒ–æ­¤ç±»
     private AccountManager()
     {
         InitializeClient();
@@ -136,13 +136,13 @@ public class AccountManager
     private static async Task<bool> RequestLeaderboard(int uid)
     {
 
-        // ´´½¨ÇëÇóÄ£ĞÍ
+        // åˆ›å»ºè¯·æ±‚æ¨¡å‹
         var requestModel = new LeaderboardRequestModel
         {
             UID = uid
         };
 
-        // ĞòÁĞ»¯ÇëÇóÄ£ĞÍÎª JSON
+        // åºåˆ—åŒ–è¯·æ±‚æ¨¡å‹ä¸º JSON
         var json = JsonConvert.SerializeObject(requestModel);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -151,7 +151,7 @@ public class AccountManager
         if (!response.IsSuccessStatusCode)
         {
             var errorMessage = await response.Content.ReadAsStringAsync();
-            MenuView.ShowPopup("ÎŞ·¨»ñÈ¡ÅÅĞĞ°ñ", $"{response.StatusCode}: {errorMessage}");
+            MenuView.ShowPopup("æ— æ³•è·å–æ’è¡Œæ¦œ", $"{response.StatusCode}: {errorMessage}");
 
             return false;
         }
@@ -159,7 +159,7 @@ public class AccountManager
         var responseString = await response.Content.ReadAsStringAsync();
         var responseObject = JsonConvert.DeserializeObject<LeaderboardResponseModel>(responseString);
 
-        // ´òÓ¡·şÎñÆ÷·µ»ØµÄ½á¹û
+        // æ‰“å°æœåŠ¡å™¨è¿”å›çš„ç»“æœ
         List<string> names = new List<string>();
         List<int> scores = new List<int>();
 
@@ -183,14 +183,14 @@ public class AccountManager
         if (!response.IsSuccessStatusCode)
         {
             var errorMessage = await response.Content.ReadAsStringAsync();
-            MenuView.ShowPopup("ÎŞ·¨Ìá½»·ÖÊı", $"{response.StatusCode}: {errorMessage}");
+            MenuView.ShowPopup("æ— æ³•æäº¤åˆ†æ•°", $"{response.StatusCode}: {errorMessage}");
 
             return false;
         }
 
         var responseString = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<RankResponse>(responseString);
-        MenuView.ShowPopup("ĞÅÏ¢", $"·ÖÊıÉÏ´«³É¹¦!\nĞÂµÄÅÅÃû: #{result.rank}");
+        MenuView.ShowPopup("ä¿¡æ¯", $"åˆ†æ•°ä¸Šä¼ æˆåŠŸ!\næ–°çš„æ’å: #{result.rank}");
         return true;
     }
 
@@ -209,14 +209,14 @@ public class AccountManager
         {
             Debug.Log("Failure");
             var errorMessage = await response.Content.ReadAsStringAsync();
-            MenuView.ShowPopup("ÎŞ·¨´´½¨ÕËºÅ", $"{response.StatusCode}: {errorMessage}");
-            Debug.Log("ÎŞ·¨´´½¨ÕËºÅ{response.StatusCode}: {errorMessage}");
+            MenuView.ShowPopup("æ— æ³•åˆ›å»ºè´¦å·", $"{response.StatusCode}: {errorMessage}");
+            Debug.Log("æ— æ³•åˆ›å»ºè´¦å·{response.StatusCode}: {errorMessage}");
             return false;
         }
         Debug.Log("Success");
         var responseString = await response.Content.ReadAsStringAsync();
-        MenuView.ShowPopup("ĞÅÏ¢", "´´½¨ÕËºÅ³É¹¦");
-        Debug.Log("ĞÅÏ¢ ´´½¨ÕËºÅ³É¹¦");
+        MenuView.ShowPopup("ä¿¡æ¯", "åˆ›å»ºè´¦å·æˆåŠŸ");
+        Debug.Log("ä¿¡æ¯ åˆ›å»ºè´¦å·æˆåŠŸ");
         return true;
     }
 
@@ -232,18 +232,18 @@ public class AccountManager
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-                Debug.Log($"¿ÉÒÔµÇÂ½");
+                Debug.Log($"å¯ä»¥ç™»é™†");
                 return true;
-                // ´¦Àí³É¹¦Âß¼­
+                // å¤„ç†æˆåŠŸé€»è¾‘
             }
             else
             {
-                // ´¦Àí²»Í¬µÄ´íÎó×´Ì¬Âë
+                // å¤„ç†ä¸åŒçš„é”™è¯¯çŠ¶æ€ç 
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    MenuView.ShowPopup("ÎŞ·¨µÇÂ¼", $"{response.StatusCode}: {errorMessage}");
-                    Debug.Log($"ÎŞ·¨µÇÂ½{response.StatusCode}: {errorMessage}");
+                    MenuView.ShowPopup("æ— æ³•ç™»å½•", $"{response.StatusCode}: {errorMessage}");
+                    Debug.Log($"æ— æ³•ç™»é™†{response.StatusCode}: {errorMessage}");
 
                     return false;
                 }
@@ -252,7 +252,7 @@ public class AccountManager
         catch (HttpRequestException e)
         {
             Console.WriteLine($"Request error: {e.Message}");
-            // ´¦ÀíÇëÇóÒì³£Âß¼­
+            // å¤„ç†è¯·æ±‚å¼‚å¸¸é€»è¾‘
         }
         return true;
     }
