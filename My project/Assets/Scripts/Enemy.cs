@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using ExcelDataReader;
 using System.IO;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public class Enemy : MonoBehaviour
 {
@@ -78,6 +79,10 @@ public class Enemy : MonoBehaviour
         if (row == 0)
         {
             slider.value -= damage;
+        }
+        if (slider.value <= 0)
+        {
+
         }
     }
 
