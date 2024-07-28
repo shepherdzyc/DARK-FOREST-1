@@ -95,18 +95,14 @@ public class AccountManager
 
     public async Task<bool> SendLogin(string userName, string password)
     {
-        bool success = await LoginAsync(new
+        Debug.Log(Convert.ToBase64String(Encoding.UTF8.GetBytes(password)));
+        return await LoginAsync(new
         {
             Username = userName,
             Password = Convert.ToBase64String(Encoding.UTF8.GetBytes(password)), // base64 encoding
             LoginDate = DateTime.UtcNow
         });
-        if(success)
-        {
-            Username = userName;
-            Password = password;
-        }
-        return success;
+
     }
 
     public async Task<bool> SendCreateAccount(string userName, string password, string nickName)
@@ -236,35 +232,32 @@ public class AccountManager
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-
-                // 解析返回的JSON
-                var responseObject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                string uid = responseObject?.uid;
-
-                // 打印UID
-                Debug.Log($"可以登陆，UID: {uid}");
+                var responseObject = JsonConvert.DeserializeObject<LoginResponse>(responseString);
+                string uid = responseObject?.Uid;
                 AccountManager.Instance.UserId = int.Parse(uid);
-                
+                Debug.Log($"可以登陆, uid: {uid}");
                 return true;
                 // 处理成功逻辑
             }
             else
             {
                 // 处理不同的错误状态码
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                MenuView.ShowPopup("无法登录", $"{response.StatusCode}: {errorMessage}");
-                Debug.Log($"无法登陆{response.StatusCode}: {errorMessage}");
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    MenuView.ShowPopup("无法登录", $"{response.StatusCode}: {errorMessage}");
+                    Debug.Log($"无法登陆{response.StatusCode}: {errorMessage}");
 
-                return false;
+                    return false;
+                }
             }
         }
         catch (HttpRequestException e)
         {
             Console.WriteLine($"Request error: {e.Message}");
             // 处理请求异常逻辑
-            // 这里可以考虑返回 false 提示登录失败
-            return false;
         }
+        return true;
     }
 
 
@@ -292,4 +285,11 @@ public class AccountManager
         public int rank { get; set; }
     }
 
+
+
+    public class LoginResponse
+    {
+        public string State { get; set; }
+        public string Uid { get; set; }
+    }
 }

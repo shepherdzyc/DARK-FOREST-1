@@ -89,7 +89,7 @@ public class MenuView : MonoBehaviour
             {
                 if (t.IsFaulted)
                 {
-                    Debug.LogError("Account creation failed");
+                    Debug.LogError("login failed");
                 }
                 else
                 {
