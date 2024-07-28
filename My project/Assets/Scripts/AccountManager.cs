@@ -114,7 +114,6 @@ public class AccountManager
             Password = Convert.ToBase64String(Encoding.UTF8.GetBytes(password)), // base64 encoding
             RegistrationDate = DateTime.UtcNow
         });
-        
     }
 
     public async Task<bool> SendScore(int uid, string password, int score)

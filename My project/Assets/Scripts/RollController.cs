@@ -170,7 +170,7 @@ public class RollController : MonoBehaviour
                 blockTransform.GetChild(1).gameObject.SetActive(false);
             }
         }
-        else
+        else if (selectedObject.GetComponent<RollController>().type == GameUtils.RollType.aroundType)
         {
             Transform blockTransform = chessBoard.transform.Find("block_" + row.ToString() + col.ToString());
             blockTransform.GetChild(0).gameObject.SetActive(false);
@@ -198,6 +198,21 @@ public class RollController : MonoBehaviour
                 Transform blockTransform4 = chessBoard.transform.Find("block_" + row.ToString() + (col + 1).ToString());
                 blockTransform4.GetChild(0).gameObject.SetActive(false);
                 blockTransform4.GetChild(1).gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            int[,] directions = new int[,] { { 0, 0 }, { 0, -1 }, { -1, 0 }, { -1, -1 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, -1 }, { -1, 1 } };
+            for (int j = 0; j < directions.GetLength(0); j++)
+            {
+                int newRow = row + directions[j, 0];
+                int newCol = col + directions[j, 1];
+                if (newRow >= 0 && newRow <= 5 && newCol >= 0 && newCol <= 4)
+                {
+                    Transform blockTransform = chessBoard.transform.Find("block_" + newRow.ToString() + newCol.ToString());
+                    blockTransform.GetChild(0).gameObject.SetActive(false);
+                    blockTransform.GetChild(1).gameObject.SetActive(false);
+                }
             }
         }
     }

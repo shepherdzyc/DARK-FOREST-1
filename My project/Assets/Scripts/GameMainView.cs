@@ -42,6 +42,12 @@ public class GameMainView : MonoBehaviour
 
     private int[] levelArr;
 
+    public GameObject addBoard;
+
+    public GameObject frozenBoard;
+
+    public GameObject fireBoard;
+
     void Awake()
     {
         levelArr = new int[] { 1, 8, 14, 19, 27, 34, 45 };
@@ -502,16 +508,19 @@ public class GameMainView : MonoBehaviour
     // 进行下一个回合
     private IEnumerator NextRound()
     {
-        GameUtils.UpRound++;
-        GameUtils.FrozenRound++;
-        GameUtils.FireRound++;
+        addBoard.GetComponent<StorageBoardController>().AddBoard();
+        frozenBoard.GetComponent<StorageBoardController>().FrozenBoard();
+        fireBoard.GetComponent<StorageBoardController>().FireBoard();
         for (int i = 0; i < GameUtils.enemysArr.Count; i++)
         {
-            GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
             if (GameUtils.posArr[i][0] > 0)
             {
-                GameUtils.posArr[i][0]--;
+                if (!GameUtils.enemysArr[i].GetComponent<Enemy>().isFrozen)
+                {
+                    GameUtils.posArr[i][0]--;
+                }
             }
+            GameUtils.enemysArr[i].GetComponent<Enemy>().Move(false);
         }
         CreateEnemy();  //先创建敌人数组，防止随后创建的骰子位置和敌人重复
         yield return new WaitForSeconds(1f);

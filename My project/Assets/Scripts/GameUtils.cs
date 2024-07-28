@@ -77,15 +77,17 @@ public class GameUtils
         return randomPos;
     }
 
-    // 随机生成骰子类型，但不包含frozenType
+    // 随机生成骰子类型，但不包含frozenType、FireType
+    // 随机生成骰子类型，但不包含frozenType、fireType
     public static RollType CreateRandomType()
     {
         // 获取所有RollType枚举值
         RollType[] allTypes = (RollType[])Enum.GetValues(typeof(RollType));
 
-        // 过滤掉frozenType
+        // 过滤掉frozenType和fireType
         List<RollType> filteredTypes = new List<RollType>(allTypes);
         filteredTypes.Remove(RollType.frozenType);
+        filteredTypes.Remove(RollType.fireType);
 
         // 随机选择一个类型
         int randomIndex = UnityEngine.Random.Range(0, filteredTypes.Count);
@@ -93,6 +95,7 @@ public class GameUtils
 
         return randomType;
     }
+
 
     // 查找骰子当前位置是否重复
     public static bool findPos(int x, int y)

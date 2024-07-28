@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using TMPro;
 using UnityEngine;
 
 public class StorageBoardController : MonoBehaviour
@@ -19,9 +20,7 @@ public class StorageBoardController : MonoBehaviour
 
     private void Update()
     {
-        AddBoard();
-        FrozenBoard();
-        FireBoard();
+
     }
 
     public void SetOccupied(bool occupied)
@@ -31,6 +30,10 @@ public class StorageBoardController : MonoBehaviour
 
     public void AddBoard()
     {
+        if (gameObject.tag == "Add" && roll != null)
+        {
+            GameUtils.UpRound++;
+        }
         if (GameUtils.UpRound == 2 && gameObject.tag == "Add" && roll != null)
         {
             if (roll.GetComponent<RollController>().num < 6)
@@ -53,6 +56,10 @@ public class StorageBoardController : MonoBehaviour
 
     public void FrozenBoard()
     {
+        if (gameObject.tag == "Frozen" && roll != null)
+        {
+            GameUtils.FrozenRound++;
+        }
         if (GameUtils.FrozenRound == 2 && gameObject.tag == "Frozen" && roll != null)
         {
             roll.GetComponent<RollController>().isFrozen = true;
@@ -63,9 +70,14 @@ public class StorageBoardController : MonoBehaviour
 
     public void FireBoard()
     {
+        if (gameObject.tag == "Fire" && roll != null)
+        {
+            GameUtils.FireRound++;
+        }
         if (GameUtils.FireRound == 2 && gameObject.tag == "Fire" && roll != null)
         {
             roll.GetComponent<RollController>().isFire = true;
+            roll.GetComponent<RollController>().type = GameUtils.RollType.fireType;
             GameUtils.FireRound = 0;
         }
     }

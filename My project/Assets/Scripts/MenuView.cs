@@ -16,6 +16,8 @@ public class MenuView : MonoBehaviour
 
     public TextMeshProUGUI password;
 
+    public GameObject loginPanel;
+
     public void PlayGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
@@ -59,11 +61,22 @@ public class MenuView : MonoBehaviour
     {
         if (usernameString.Length > 2 && passwordString.Length > 2)
         {
-            Task tsk =  AccountManager.Instance.SendCreateAccount(usernameString, passwordString, usernameString);
+            Task tsk = AccountManager.Instance.SendCreateAccount(usernameString, passwordString, usernameString);
             tsk.ContinueWith(t =>
             {
-            });
-            
+                if (t.IsFaulted)
+                {
+                    Debug.LogError("Account creation failed");
+                }
+                else
+                {
+                    Debug.Log(0);
+                }
+            }).ContinueWith(t =>
+            {
+                loginPanel.SetActive(false);
+                Debug.Log(1);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 
@@ -72,17 +85,27 @@ public class MenuView : MonoBehaviour
         if (usernameString.Length > 2 && passwordString.Length > 2)
         {
             Task tsk = AccountManager.Instance.SendLogin(usernameString, passwordString);
-            tsk.ContinueWith(t => { });
+            tsk.ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    Debug.LogError("Account creation failed");
+                }
+                else
+                {
+                    loginPanel.SetActive(false);
+                    Debug.Log(1);
+                }
+            });
         }
     }
-
-    // 更新排行榜方法
 
     public static void ShowPopup(string title, string message)
     {
         //to be completed
         return;
     }
+
     public void UpdateLeaderboard(string[] playerNames, int[] scores)
     {
         // 清空现有的排行榜
