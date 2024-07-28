@@ -93,10 +93,13 @@ public class MenuView : MonoBehaviour
                 }
                 else
                 {
-                    loginPanel.SetActive(false);
-                    Debug.Log(1);
+                    Debug.Log(0);
                 }
-            });
+            }).ContinueWith(t =>
+            {
+                loginPanel.SetActive(false);
+                Debug.Log(1);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 
